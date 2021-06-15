@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+# File Structures
+/.vs
+/_bin
+/_other
+/_tmp

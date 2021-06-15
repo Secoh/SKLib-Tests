@@ -1,0 +1,125 @@
+// test-bitwise-performance.cpp : This file contains the 'main' function. Program execution begins and ends there.
+//
+
+#include <iostream>
+#include <cstdio>
+#include <ctime>
+#include <chrono>
+
+#include <SKLib/bitwise.hpp>
+
+int main()
+{
+    // prepare
+
+    size_t DLEN = sklib::bitwise::high_half_bits<uint16_t>();
+    uint8_t* DATA = new uint8_t[DLEN];
+    srand((unsigned)time(nullptr));
+    for (size_t i = 0; i < DLEN; i++) DATA[i] = (rand() % 0x100);
+
+    // addressing data timing
+
+    auto T_start = std::chrono::steady_clock::now();
+
+    int64_t V = 0;
+    for (size_t i = 0; i < DLEN; i++) V += DATA[i];
+
+    auto T_finish = std::chrono::steady_clock::now();
+    std::cout << "Length: " << DLEN << "\nAddress: " << V << "\n" << std::chrono::duration<double>(T_finish - T_start).count() * 1000 << " ms\n";
+
+    // flip: 8 bit table
+
+    T_start = std::chrono::steady_clock::now();
+
+    V = 0;
+    for (size_t i = 0; i < DLEN; i++) V += sklib::bitwise::flip<uint8_t>(DATA[i]);
+
+    T_finish = std::chrono::steady_clock::now();
+    std::cout << "Flip\nFast: " << V << "\n" << std::chrono::duration<double>(T_finish - T_start).count() * 1000 << " ms\n";
+
+    // flip: 8 bit bruteforce
+
+    T_start = std::chrono::steady_clock::now();
+
+    V = 0;
+    for (size_t i = 0; i < DLEN; i++) V += sklib::bitwise::flip_bruteforce<uint8_t>(DATA[i]);
+
+    T_finish = std::chrono::steady_clock::now();
+    std::cout << "Slow: " << V << "\n" << std::chrono::duration<double>(T_finish - T_start).count() * 1000 << " ms\n";
+
+    // flip: 32 bit normal
+
+    T_start = std::chrono::steady_clock::now();
+
+    V = 0;
+    for (size_t i = 0; i < DLEN; i++) V += sklib::bitwise::flip<4>(uint32_t(DATA[i]));
+
+    T_finish = std::chrono::steady_clock::now();
+    std::cout << "Fast: " << V << "\n" << std::chrono::duration<double>(T_finish - T_start).count() * 1000 << " ms\n";
+
+    // flip: 32 bit bruteforce
+
+    T_start = std::chrono::steady_clock::now();
+
+    V = 0;
+    for (size_t i = 0; i < DLEN; i++) V += sklib::bitwise::flip_bruteforce<uint32_t>(DATA[i]);
+
+    T_finish = std::chrono::steady_clock::now();
+    std::cout << "Slow: " << V << "\n" << std::chrono::duration<double>(T_finish - T_start).count() * 1000 << " ms\n";
+
+    // rank: 8 bit table
+
+    T_start = std::chrono::steady_clock::now();
+
+    V = 0;
+    for (size_t i = 0; i < DLEN; i++) V += sklib::bitwise::rank<uint8_t>(DATA[i]);
+
+    T_finish = std::chrono::steady_clock::now();
+    std::cout << "Rank\nFast: " << V << "\n" << std::chrono::duration<double>(T_finish - T_start).count() * 1000 << " ms\n";
+
+    // rank: 8 bit bruteforce
+
+    T_start = std::chrono::steady_clock::now();
+
+    V = 0;
+    for (size_t i = 0; i < DLEN; i++) V += sklib::bitwise::rank_bruteforce(DATA[i]);
+
+    T_finish = std::chrono::steady_clock::now();
+    std::cout << "Slow: " << V << "\n" << std::chrono::duration<double>(T_finish - T_start).count() * 1000 << " ms\n";
+
+    // rank: 8 bit fork
+
+    T_start = std::chrono::steady_clock::now();
+
+    V = 0;
+    for (size_t i = 0; i < DLEN; i++) V += sklib::bitwise::rank8_fork(DATA[i]);
+
+    T_finish = std::chrono::steady_clock::now();
+    std::cout << "Fork: " << V << "\n" << std::chrono::duration<double>(T_finish - T_start).count() * 1000 << " ms\n";
+
+    // rank: 32 bit fast
+
+    T_start = std::chrono::steady_clock::now();
+
+    V = 0;
+    for (size_t i = 0; i < DLEN; i++) V += sklib::bitwise::rank(uint32_t(DATA[i]) << 24);
+
+    T_finish = std::chrono::steady_clock::now();
+    std::cout << "Fast: " << V << "\n" << std::chrono::duration<double>(T_finish - T_start).count() * 1000 << " ms\n";
+
+    // rank: 32 bit bruteforce
+
+    T_start = std::chrono::steady_clock::now();
+
+    V = 0;
+    for (size_t i = 0; i < DLEN; i++) V += sklib::bitwise::rank_bruteforce(uint32_t(DATA[i]) << 24);
+
+    T_finish = std::chrono::steady_clock::now();
+    std::cout << "Slow: " << V << "\n" << std::chrono::duration<double>(T_finish - T_start).count() * 1000 << " ms\n";
+
+    // cleanup
+
+    delete[] DATA;
+    return 0;
+}
+
