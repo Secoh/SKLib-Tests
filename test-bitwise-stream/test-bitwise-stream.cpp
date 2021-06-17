@@ -2,7 +2,7 @@
 //     bitwise::bit_stream
 //     bitwise::bit_file
 //
-// Written by Secoh, 2021
+// Written by Secoh, 2021 // https://github.com/Secoh/SKLib-Tests
 //
 // This is free and unencumbered software released into the public domain.
 // Software is distributed on "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -125,6 +125,8 @@ int main(int argn, char *argc[])
             }
         }
     }
+
+    // no garbage collection in demo
 
     return 0;
 }
