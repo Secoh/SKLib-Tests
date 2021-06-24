@@ -1,7 +1,6 @@
 // Thie purpose of this software is to debug certain functions of SKLib, and to provide example how to use them:
-//     timer::delay
-//     timer::chrono_literals
-//     units, conversions
+//     time_wait
+//     timer: chrono_literals, units, conversions
 // 
 // Written by Secoh, 2021 // https://github.com/Secoh/SKLib-Tests
 //
@@ -17,7 +16,7 @@
 
 void example_with_no_namespace_pollution()
 {
-    sklib::delay(0.01_minutes_sklib);       // here we call it without "using namespace"
+    sklib::time_wait(0.01_minutes_sklib);       // here we call it without "using namespace"
 }
 
 int main()
@@ -31,24 +30,24 @@ int main()
 
     std::cout << "2\n";
 
-    delay(3ms);     // unit comes from std::chrono_literals
+    time_wait(3ms);     // unit comes from std::chrono_literals
 
     std::cout << "3\n";
 
     {
         using namespace sklib::chrono_literals;     // this is for completeness
-        delay(1.3_seconds);
+        time_wait(1.3_seconds);
     }
 
     std::cout << "4\n";
 
-    delay(77); /* ms */   // immortal classic ;)
+    time_wait(77); /* ms */   // immortal classic ;)
 
     std::cout << "5\n";
 
     auto T = 3;
-    delay(seconds(T));                  // conversion from integer expression
-    delay(microseconds(exp(T*0.7)));    // conversion from double expression
+    time_wait(seconds_to_chrono(T));                  // conversion from integer expression
+    time_wait(microseconds_to_chrono(exp(T*0.7)));    // conversion from double expression
 
     return 0;
 }
