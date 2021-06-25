@@ -19,7 +19,7 @@ int main()
 
     std::cout << "Type any letter within 10 seconds\nSpecial: 1-start, 2-stop, 3-reset, 0-exit\n";
 
-    sklib::timer_stopwatch_t check(sklib::seconds_to_chrono(10));
+    sklib::timer_stopwatch_t check(sklib::time_seconds(10));
     sklib::timer_stopwatch_t global;
 
     sklib::timer_stopwatch_t something_else(300_ms);
@@ -36,7 +36,7 @@ int main()
 #else
         if (check.is_timeout())
         {
-            std::cout << "Timeout; " << sklib::chrono_to_seconds<double>(global.read()) << "(" << sklib::chrono_to_seconds<double>(check.read()) << ") " << "\n";
+            std::cout << "Timeout; " << sklib::time_to_seconds<double>(global) << "(" << sklib::time_to_seconds<double>(check.read()) << ") " << "\n";
             break;
         }
 #endif
@@ -46,7 +46,7 @@ int main()
             unsigned char c = _getch();
             if (c >= ' ' && c < 0x7F)
             {
-                std::cout << sklib::chrono_to_seconds<double>(global.read()) << "(" << sklib::chrono_to_seconds<double>(check) << ") " << c << "\n";
+                std::cout << sklib::time_to_seconds<double>(global.read()) << "(" << sklib::time_to_seconds<double>(check) << ") " << c << "\n";
 
                 if (c == '1') check.start();
                 if (c == '2') check.stop();

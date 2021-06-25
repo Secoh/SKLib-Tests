@@ -46,8 +46,8 @@ int main()
     std::cout << "5\n";
 
     auto T = 3;
-    time_wait(seconds_to_chrono(T));                  // conversion from integer expression
-    time_wait(microseconds_to_chrono(exp(T*0.7)));    // conversion from double expression
+    time_wait(time_seconds(T));                  // conversion from integer expression
+    time_wait(time_microseconds(exp(T*0.7)));    // conversion from double expression
 
     return 0;
 }
