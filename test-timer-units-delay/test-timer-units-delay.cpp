@@ -49,6 +49,13 @@ int main()
     time_wait(time_seconds(T));                  // conversion from integer expression
     time_wait(time_microseconds(exp(T*0.7)));    // conversion from double expression
 
+    auto TT = 50_ms_sklib;
+    auto TF = 100.5_ms_sklib;
+    auto TM = 60_minutes_sklib;
+
+    // error: std::cout << time_to_seconds(TT);
+    std::cout << time_to_seconds<double>(TT) << " " << time_to_seconds<double>(TF) << " " << time_to_seconds<int>(TM) << "\n";  // correct
+
     return 0;
 }
 

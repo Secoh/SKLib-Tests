@@ -17,43 +17,41 @@ int main()
 {
     using namespace sklib::chrono_literals;
 
-    std::cout << "Type any letter within 10 seconds\nSpecial: 1-start, 2-stop, 3-reset, 0-exit\n";
+    std::cout << "Timer 1 is counter, Timer 2 is timeout (10 seconds)\nCommands: 1-Start T1, 2-Stop T1, 3-Reset Both, 0-Exit\n";
 
-    sklib::timer_stopwatch_t check(sklib::time_seconds(10));
-    sklib::timer_stopwatch_t global;
+    sklib::timer_stopwatch_t timeout(10_s);
+    sklib::timer_stopwatch_t counter(sklib::timer_stopwatch_t::create_mode_t::idle);
 
-    sklib::timer_stopwatch_t something_else(300_ms);
-    auto more_something = sklib::timer_stopwatch_t(5.3);
+    sklib::timer_stopwatch_t something_else(sklib::time_milliseconds(300));
+    auto more_something = sklib::timer_stopwatch_t(5.3); /* ms */
+
+    bool timeout_posted = false;
 
     while (true)
     {
-#ifdef _SKLIB_TIMEWATCH_ALLOW_EXPLICIT_CAST
-        if (check)
-        {
-            std::cout << "Timeout; " << double(global) << "(" << check.read() << ") " << "\n";
-            break;
-        }
-#else
-        if (check.is_timeout())
-        {
-            std::cout << "Timeout; " << sklib::time_to_seconds<double>(global) << "(" << sklib::time_to_seconds<double>(check.read()) << ") " << "\n";
-            break;
-        }
-#endif
-
         if (_kbhit())
         {
             unsigned char c = _getch();
             if (c >= ' ' && c < 0x7F)
             {
-                std::cout << sklib::time_to_seconds<double>(global.read()) << "(" << sklib::time_to_seconds<double>(check) << ") " << c << "\n";
+                std::cout << sklib::time_to_seconds<double>(counter.read()) << " / " << sklib::time_to_seconds<double>(timeout) << " / " << c << "\n";
 
-                if (c == '1') check.start();
-                if (c == '2') check.stop();
-                if (c == '3') check.reset();
+                if (c == '1') counter.start();
+                if (c == '2') counter.stop();
+                if (c == '3') { counter.reset(); timeout.reset(); }
                 if (c == '0') break;
             }
+
+            timeout_posted = false; // refresh
+        }
+
+        if (!timeout_posted && timeout)
+        {
+            timeout_posted = true;
+            std::cout << "Timeout detected: " << sklib::time_to_seconds<double>(counter) << " / " << sklib::time_to_seconds<double>(timeout.read()) << "\n";
         }
     }
+
+    return 0;
 }
 
