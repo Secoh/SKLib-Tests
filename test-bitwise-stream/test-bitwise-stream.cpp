@@ -17,27 +17,27 @@
 
 #include <SKLib/SKLib.hpp>
 
-static constexpr auto BYTE_BITS = sklib::bitwise::BYTE_BITS;
-
 uint64_t clean_int(uint8_t Nbit, uint64_t data)
 {
     if (!Nbit) return 0;
-    if (Nbit >= sklib::bitwise::INT64_BITS) return ~0ull;
+    if (Nbit >= sklib::supplement::bits_data_width<uint64_t>()) return ~0ull;
     return (data & ((1ull << Nbit) - 1));
 }
 
+// returns random pair { N bits, Data }
+// where N is 1..64, Data is unsigned integer within N bits
 std::pair<uint8_t, uint64_t> generate_node()
 {
-    uint8_t N = (rand() % sklib::bitwise::INT64_BITS) + 1;
-    size_t K = (N + BYTE_BITS - 1) % BYTE_BITS;
+    uint8_t N = (rand() % sklib::supplement::bits_data_width<uint64_t>()) + 1;
+    size_t K = (N + sklib::OCTET_BITS - 1) % sklib::OCTET_BITS;
 
     uint64_t V = 0;
-    for (size_t t=0; t<K; t++) V = ((V << BYTE_BITS) | (rand() & sklib::bitwise::BYTE_MASK));
+    for (size_t t=0; t<K; t++) V = ((V << sklib::OCTET_BITS) | (rand() & sklib::OCTET_MASK));
 
     return { N, clean_int(N, V) };
 }
 
-class my_byte_stream : public sklib::bitwise::bit_stream_base_t
+class my_byte_stream : public sklib::bits_stream_base_type
 {
 public:
     size_t Rpos = 0;
@@ -79,10 +79,10 @@ int main(int argn, char *argc[])
 
     std::vector<std::pair<uint8_t, uint64_t>> DATA;
     my_byte_stream PACKED_IN_MEMORY;
-    sklib::bitwise::bit_stream_base_t *PACKED = &PACKED_IN_MEMORY;
+    sklib::bits_stream_base_type *PACKED = &PACKED_IN_MEMORY;
 
     // enable disk file test, if an argument is given
-    if (argn >= 2) PACKED = new sklib::bitwise::bit_file_t(argc[1]);
+    if (argn >= 2) PACKED = new sklib::bits_file_type(argc[1]);
 
     uint64_t count = 0;
     while (true)
@@ -105,19 +105,19 @@ int main(int argn, char *argc[])
         {
             auto node = generate_node();
             DATA.push_back(node);
-            *PACKED << sklib::bitwise::bit_pack_t{ node.first, node.second };
+            *PACKED << sklib::bits_pack(node.second, node.first);   // bit width, data
         }
 
-        PACKED->flush();
+        PACKED->write_flush();
 
         // ...read and verify
 
-        PACKED->rewind();
+        PACKED->read_rewind();
 
         for (size_t k = 0; k < DLEN; k++)
         {
-            sklib::bitwise::bit_pack_t node{ DATA[k].first, 0 };
-            *PACKED >> node;
+            auto node = sklib::bits_pack<uint64_t>(0, DATA[k].first);   // we read known count of bits; the received data word must match the log
+            *PACKED >> node;                                            // important: we have to give it specifically the data size: uint64_t
             if (node.data != DATA[k].second)
             {
                 std::cout << "\nFailed\n";

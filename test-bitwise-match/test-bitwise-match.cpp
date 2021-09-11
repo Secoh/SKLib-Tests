@@ -22,39 +22,54 @@
 template<class T>
 bool do_test(T A)
 {
-    auto v1 = sklib::bitwise::flip<T>(A);
-    auto a1 = sklib::bitwise::flip<T>(v1);
-    auto v2 = sklib::bitwise::flip_bruteforce<T>(A);
+    // flip
 
-    if (a1 != A)
+    auto v1f = sklib::bits_flip<T>(A);
+    auto a1f = sklib::bits_flip<T>(v1f);
+    auto v2f = sklib::supplement::bits_flip_bruteforce<T>(A);
+
+    if (a1f != A)
     {
-        std::cout << "Double flip() mismatch: " << (uint64_t)A << " -> " << (uint64_t)v1 << " -> " << (uint64_t)a1 << "\n";
+        std::cout << "Double flip() mismatch: " << (uint64_t)A << " -> " << (uint64_t)v1f << " -> " << (uint64_t)a1f << "\n";
         return false;
     }
 
-    if (v1 != v2)
+    if (v1f != v2f)
     {
-        std::cout << "Mismatch flip() algorithms: Input=" << (uint64_t)A << ", Fast=" << (uint64_t)v1 << ", Bruteforce=" << (uint64_t)v2 << "\n";
+        std::cout << "Mismatch flip() algorithms: Input=" << (uint64_t)A << ", Fast=" << (uint64_t)v1f << ", Bruteforce=" << (uint64_t)v2f << "\n";
         return false;
     }
 
-    v1 = sklib::bitwise::rank<T>(A);
-    v2 = (T)sklib::bitwise::rank_bruteforce(A);
+    // rank
 
-    if (v1 != v2)
+    unsigned v1r = sklib::bits_rank<T>(A);
+    unsigned v2r = (T)sklib::supplement::bits_rank_bruteforce(A);
+
+    if (v1r != v2r)
     {
-        std::cout << "Mismatch rank() algorithms: Input=" << (uint64_t)A << ", Fast=" << (uint64_t)v1 << ", Bruteforce=" << (uint64_t)v2 << "\n";
+        std::cout << "Mismatch rank() algorithms: Input=" << (uint64_t)A << ", Fast=" << (uint64_t)v1r << ", Bruteforce=" << (uint64_t)v2r << "\n";
         return false;
     }
 
     if (sizeof(T) == sizeof(uint8_t))
     {
-        auto v3 = sklib::bitwise::rank8_fork((uint8_t)A);
-        if (v1 != v3)
+        auto v3r = sklib::supplement::bits_rank8_fork((uint8_t)A);
+        if (v1r != v3r)
         {
-            std::cout << "Mismatch rank() algorithms: Input=" << (uint64_t)A << ", Common=" << (uint64_t)v1 << ", Fork=" << (uint64_t)v3 << "\n";
+            std::cout << "Mismatch rank() algorithms: Input=" << (uint64_t)A << ", Common=" << (uint64_t)v1r << ", Fork=" << (uint64_t)v3r << "\n";
             return false;
         }
+    }
+
+    // distance
+
+    unsigned v1d = sklib::bits_distance<T>(A);
+    unsigned v2d = sklib::supplement::bits_distance_bruteforce<T>(A);
+
+    if (v1d != v2d)
+    {
+        std::cout << "Mismatch distance() algorithms: Input=" << (uint64_t)A << ", Fast=" << (uint64_t)v1d << ", Bruteforce=" << (uint64_t)v2d << "\n";
+        return false;
     }
 
     return true;

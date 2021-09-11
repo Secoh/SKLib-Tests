@@ -8,12 +8,14 @@
 
 #include <SKLib/SKLib.hpp>
 
-class base64_t : public sklib::bitwise::bit_stream_base_t
+class base64_t : public sklib::bits_stream_base_type
 {
 private:
+    static const unsigned encoding_bit_count = 6;
+
     std::vector<uint8_t> *data_ptr;     // for a while, lets do testing with simple stuff
     size_t k_data;
-    sklib::bitwise::bit_cpack_t<6> d_tmp{ 0 };
+    ::sklib::supplement::bits_fixed_pack_type<encoding_bit_count, uint8_t> d_tmp{ 0 };
 
 public:
     base64_t(std::vector<uint8_t>& data) : data_ptr(&data), k_data(0) {}
@@ -22,7 +24,7 @@ public:
 
     char get_encoded()     // assuming input is clear text (sequence of octets), do encode; return EOL when there is no more input
     {
-        if (!check(d_tmp)) return EOL;
+        if (!can_read(d_tmp)) return EOL;
         operator>> (d_tmp);
         return (d_tmp.data < DictLen ? Dict[d_tmp.data] : EOL);
     }
@@ -31,7 +33,7 @@ public:
     {
         if (c == EOL)
         {
-            flush();
+            write_flush();
             return true;
         }
 
@@ -45,10 +47,10 @@ public:
         return true;
     }
 
-    void generate_inverse_table(uint8_t(&U)[sklib::bitwise::BYTE_ADDRESS_SPAN])
+    void generate_inverse_table(uint8_t(&U)[sklib::OCTET_ADDRESS_SPAN])
     {
         for (int k = 0; k <= ' '; k++) U[k] = MarkSpc;
-        for (int k = ' ' + 1; k < sklib::bitwise::BYTE_ADDRESS_SPAN; k++) U[k] = MarkErr;
+        for (int k = ' ' + 1; k < sklib::OCTET_ADDRESS_SPAN; k++) U[k] = MarkErr;
         for (size_t k = 0; k < DictLen; k++) U[Dict[k]] = (uint8_t)k;
     }
 
@@ -66,12 +68,12 @@ protected:
     }
 
 private:
-    static const int DataSizeBits = 6;
+    static const int DataSizeBits = encoding_bit_count;
     static const size_t DictLen = (1 << DataSizeBits);
     static constexpr char Dict[DictLen+1] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
     // 6-bit word for an input letter, or MarkSpc for whitespace, or MarkErr for invalid data
-    static constexpr uint8_t DictInv[sklib::bitwise::BYTE_ADDRESS_SPAN] = {
+    static constexpr uint8_t DictInv[sklib::OCTET_ADDRESS_SPAN] = {
         0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0,
         0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0,
         0xF0, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x3E, 0xFF, 0xFF, 0xFF, 0x3F,
@@ -119,7 +121,7 @@ int wmain(int argn, wchar_t* argc[])
 
     if (get_table)
     {
-        uint8_t TAB[sklib::bitwise::BYTE_ADDRESS_SPAN];
+        uint8_t TAB[sklib::OCTET_ADDRESS_SPAN];
 
         Proc.generate_inverse_table(TAB);
 

@@ -20,7 +20,7 @@ int main()
 {
     // prepare
 
-    size_t DLEN = sklib::bitwise::high_half_bits<uint16_t>();
+    size_t DLEN = sklib::supplement::bits_data_high_half<uint16_t>();
     uint8_t* DATA = new uint8_t[DLEN];
     srand((unsigned)time(nullptr));
     for (size_t i = 0; i < DLEN; i++) DATA[i] = (rand() % 0x100);
@@ -40,7 +40,7 @@ int main()
     T_start = std::chrono::steady_clock::now();
 
     V = 0;
-    for (size_t i = 0; i < DLEN; i++) V += sklib::bitwise::flip<uint8_t>(DATA[i]);
+    for (size_t i = 0; i < DLEN; i++) V += sklib::bits_flip<uint8_t>(DATA[i]);
 
     T_finish = std::chrono::steady_clock::now();
     std::cout << "Flip\nFast: " << V << "\n" << std::chrono::duration<double>(T_finish - T_start).count() * 1000 << " ms\n";
@@ -50,7 +50,7 @@ int main()
     T_start = std::chrono::steady_clock::now();
 
     V = 0;
-    for (size_t i = 0; i < DLEN; i++) V += sklib::bitwise::flip_bruteforce<uint8_t>(DATA[i]);
+    for (size_t i = 0; i < DLEN; i++) V += sklib::supplement::bits_flip_bruteforce<uint8_t>(DATA[i]);
 
     T_finish = std::chrono::steady_clock::now();
     std::cout << "Slow: " << V << "\n" << std::chrono::duration<double>(T_finish - T_start).count() * 1000 << " ms\n";
@@ -60,7 +60,7 @@ int main()
     T_start = std::chrono::steady_clock::now();
 
     V = 0;
-    for (size_t i = 0; i < DLEN; i++) V += sklib::bitwise::flip<4>(uint32_t(DATA[i]));
+    for (size_t i = 0; i < DLEN; i++) V += sklib::supplement::bits_flip<4>(uint32_t(DATA[i]));
 
     T_finish = std::chrono::steady_clock::now();
     std::cout << "Fast: " << V << "\n" << std::chrono::duration<double>(T_finish - T_start).count() * 1000 << " ms\n";
@@ -70,7 +70,7 @@ int main()
     T_start = std::chrono::steady_clock::now();
 
     V = 0;
-    for (size_t i = 0; i < DLEN; i++) V += sklib::bitwise::flip_bruteforce<uint32_t>(DATA[i]);
+    for (size_t i = 0; i < DLEN; i++) V += sklib::supplement::bits_flip_bruteforce<uint32_t>(DATA[i]);
 
     T_finish = std::chrono::steady_clock::now();
     std::cout << "Slow: " << V << "\n" << std::chrono::duration<double>(T_finish - T_start).count() * 1000 << " ms\n";
@@ -80,7 +80,7 @@ int main()
     T_start = std::chrono::steady_clock::now();
 
     V = 0;
-    for (size_t i = 0; i < DLEN; i++) V += sklib::bitwise::rank<uint8_t>(DATA[i]);
+    for (size_t i = 0; i < DLEN; i++) V += sklib::bits_rank<uint8_t>(DATA[i]);
 
     T_finish = std::chrono::steady_clock::now();
     std::cout << "Rank\nFast: " << V << "\n" << std::chrono::duration<double>(T_finish - T_start).count() * 1000 << " ms\n";
@@ -90,7 +90,7 @@ int main()
     T_start = std::chrono::steady_clock::now();
 
     V = 0;
-    for (size_t i = 0; i < DLEN; i++) V += sklib::bitwise::rank_bruteforce(DATA[i]);
+    for (size_t i = 0; i < DLEN; i++) V += sklib::supplement::bits_rank_bruteforce(DATA[i]);
 
     T_finish = std::chrono::steady_clock::now();
     std::cout << "Slow: " << V << "\n" << std::chrono::duration<double>(T_finish - T_start).count() * 1000 << " ms\n";
@@ -100,7 +100,7 @@ int main()
     T_start = std::chrono::steady_clock::now();
 
     V = 0;
-    for (size_t i = 0; i < DLEN; i++) V += sklib::bitwise::rank8_fork(DATA[i]);
+    for (size_t i = 0; i < DLEN; i++) V += sklib::supplement::bits_rank8_fork(DATA[i]);
 
     T_finish = std::chrono::steady_clock::now();
     std::cout << "Fork: " << V << "\n" << std::chrono::duration<double>(T_finish - T_start).count() * 1000 << " ms\n";
@@ -110,7 +110,7 @@ int main()
     T_start = std::chrono::steady_clock::now();
 
     V = 0;
-    for (size_t i = 0; i < DLEN; i++) V += sklib::bitwise::rank(uint32_t(DATA[i]) << 24);
+    for (size_t i = 0; i < DLEN; i++) V += sklib::bits_rank(uint32_t(DATA[i]) << 24);
 
     T_finish = std::chrono::steady_clock::now();
     std::cout << "Fast: " << V << "\n" << std::chrono::duration<double>(T_finish - T_start).count() * 1000 << " ms\n";
@@ -120,7 +120,47 @@ int main()
     T_start = std::chrono::steady_clock::now();
 
     V = 0;
-    for (size_t i = 0; i < DLEN; i++) V += sklib::bitwise::rank_bruteforce(uint32_t(DATA[i]) << 24);
+    for (size_t i = 0; i < DLEN; i++) V += sklib::supplement::bits_rank_bruteforce(uint32_t(DATA[i]) << 24);
+
+    T_finish = std::chrono::steady_clock::now();
+    std::cout << "Slow: " << V << "\n" << std::chrono::duration<double>(T_finish - T_start).count() * 1000 << " ms\n";
+
+    // distance: 8 bit table
+
+    T_start = std::chrono::steady_clock::now();
+
+    V = 0;
+    for (size_t i = 0; i < DLEN; i++) V += sklib::bits_distance<uint8_t>(DATA[i]);
+
+    T_finish = std::chrono::steady_clock::now();
+    std::cout << "Distance\nFast: " << V << "\n" << std::chrono::duration<double>(T_finish - T_start).count() * 1000 << " ms\n";
+
+    // distance: 8 bit bruteforce
+
+    T_start = std::chrono::steady_clock::now();
+
+    V = 0;
+    for (size_t i = 0; i < DLEN; i++) V += sklib::supplement::bits_distance_bruteforce(DATA[i]);
+
+    T_finish = std::chrono::steady_clock::now();
+    std::cout << "Slow: " << V << "\n" << std::chrono::duration<double>(T_finish - T_start).count() * 1000 << " ms\n";
+
+    // distance: 32 bit fast
+
+    T_start = std::chrono::steady_clock::now();
+
+    V = 0;
+    for (size_t i = 0; i < DLEN; i++) V += sklib::bits_distance(uint32_t(DATA[i]) << 24);
+
+    T_finish = std::chrono::steady_clock::now();
+    std::cout << "Fast: " << V << "\n" << std::chrono::duration<double>(T_finish - T_start).count() * 1000 << " ms\n";
+
+    // distance: 32 bit bruteforce
+
+    T_start = std::chrono::steady_clock::now();
+
+    V = 0;
+    for (size_t i = 0; i < DLEN; i++) V += sklib::supplement::bits_distance_bruteforce(uint32_t(DATA[i]) << 24);
 
     T_finish = std::chrono::steady_clock::now();
     std::cout << "Slow: " << V << "\n" << std::chrono::duration<double>(T_finish - T_start).count() * 1000 << " ms\n";
