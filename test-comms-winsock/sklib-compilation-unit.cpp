@@ -8,5 +8,5 @@
 // For more information, please refer to: http://unlicense.org/
 //
 
-#include <SKLib/comms-code.hpp>
+#include <SKLib/source/comms-code.hpp>
 

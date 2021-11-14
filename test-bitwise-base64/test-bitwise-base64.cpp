@@ -5,125 +5,57 @@
 #include <algorithm>
 #include <string>
 #include <vector>
+#include <chrono>
 
 #include <SKLib/SKLib.hpp>
 
-class base64_t : public sklib::bits_stream_base_type
+std::string STOR;    // we keep here all input from command line parameters, for simplicity
+size_t Stor_idx = 0;
+std::chrono::steady_clock::time_point Will_read = std::chrono::steady_clock::now();
+
+bool RD(sklib::base64_type*, int& data)
 {
-private:
-    static const unsigned encoding_bit_count = 6;
+    using namespace std::chrono_literals;
 
-    std::vector<uint8_t> *data_ptr;     // for a while, lets do testing with simple stuff
-    size_t k_data;
-    ::sklib::supplement::bits_fixed_pack_type<encoding_bit_count, uint8_t> d_tmp{ 0 };
+    if (Will_read > std::chrono::steady_clock::now()) return false;  // next symbol "didn't arrive"
 
-public:
-    base64_t(std::vector<uint8_t>& data) : data_ptr(&data), k_data(0) {}
+    Will_read = std::chrono::steady_clock::now() + std::chrono::steady_clock::duration(200ms);
 
-    static const char EOL = '=';
+    data = (Stor_idx < STOR.length() ? STOR[Stor_idx++] : EOF);
+    return true;
+}
 
-    char get_encoded()     // assuming input is clear text (sequence of octets), do encode; return EOL when there is no more input
-    {
-        if (!can_read(d_tmp)) return EOL;
-        operator>> (d_tmp);
-        return (d_tmp.data < DictLen ? Dict[d_tmp.data] : EOL);
-    }
-
-    bool do_decode(char c)   // send Base64 letters to decoder, clear text is collected in *data_ptr; send EOL for end of stream
-    {
-        if (c == EOL)
-        {
-            write_flush();
-            return true;
-        }
-
-        uint8_t uc = DictInv[(uint8_t)c];
-        if (uc == MarkSpc) return true;
-        if (uc >= DictLen) return false;
-
-        d_tmp.data = uc;
-        operator<< (d_tmp);
-
-        return true;
-    }
-
-    void generate_inverse_table(uint8_t(&U)[sklib::OCTET_ADDRESS_SPAN])
-    {
-        for (int k = 0; k <= ' '; k++) U[k] = MarkSpc;
-        for (int k = ' ' + 1; k < sklib::OCTET_ADDRESS_SPAN; k++) U[k] = MarkErr;
-        for (size_t k = 0; k < DictLen; k++) U[Dict[k]] = (uint8_t)k;
-    }
-
-protected:
-    virtual void push_byte(uint8_t d)
-    {
-        data_ptr->push_back(d);
-    }
-
-    virtual bool pop_byte(uint8_t& d)
-    {
-        if (k_data >= data_ptr->size()) return false;
-        d = (*data_ptr)[k_data++];
-        return true;
-    }
-
-private:
-    static const int DataSizeBits = encoding_bit_count;
-    static const size_t DictLen = (1 << DataSizeBits);
-    static constexpr char Dict[DictLen+1] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
-    // 6-bit word for an input letter, or MarkSpc for whitespace, or MarkErr for invalid data
-    static constexpr uint8_t DictInv[sklib::OCTET_ADDRESS_SPAN] = {
-        0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0,
-        0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0, 0xF0,
-        0xF0, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x3E, 0xFF, 0xFF, 0xFF, 0x3F,
-        0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-        0xFF, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E,
-        0x0F, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-        0xFF, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28,
-        0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, 0x30, 0x31, 0x32, 0x33, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-    static const uint8_t MarkSpc = 0xF0;
-    static const uint8_t MarkErr = 0xFF;
-};
-
-int wmain(int argn, wchar_t* argc[])
+void WR(sklib::base64_type*, int data)
 {
-    if (argn < 3)
+    if (data < 0) std::cout << "<EOL>\n";
+    else std::cout << (char)data;
+}
+
+int main(int argn, char *argc[])
+{
+    if (argn < 2)
     {
-        std::cout << "base64.exe [a]e|d|g string {string...}\n"
-                     "  e - encode sequence of strings; d - decode; g - generate table\n"
-                     "  specify letter \"a\" to force ASCII (default is Unicode)\n"
-                     "  When no argument is given, will keep data stream in the mem\n";
+        std::cout << "base64.exe {e|d}{r|w}|g [string {string...}]\n"
+                     "  e - encode function\n"
+                     "  d - decode\n"
+                     "  r - \"read\" - tester is reading from encoder; parameters are treated as input file\n"
+                     "  w = \"write\" - tester sends all parameters to encoder in loop undil end\n"
+                     "  g - generate table\n";
         return -1;
     }
 
-    bool force_ascii = (std::wstring(argc[1]).find(L'a') != std::wstring::npos);
-    bool encode = (std::wstring(argc[1]).find(L'e') != std::wstring::npos);
-    bool decode = (std::wstring(argc[1]).find(L'd') != std::wstring::npos);
-    bool get_table = (std::wstring(argc[1]).find(L'g') != std::wstring::npos);
-
-    if ((int)encode + (int)decode + (int)get_table != 1)
-    {
-        std::cout << "Specify either encode or decode (or generate table), but not combinations\n";
-        return -1;
-    }
-
-    std::vector<uint8_t> clear_text;
-    base64_t Proc(clear_text);
+    std::string par = argc[1];
+    bool encode = (par.find('e') != std::wstring::npos);
+    bool decode = (par.find('d') != std::wstring::npos);
+    bool do_read = (par.find('r') != std::wstring::npos);
+    bool do_write = (par.find('w') != std::wstring::npos);
+    bool get_table = (par.find('g') != std::wstring::npos);
 
     if (get_table)
     {
         uint8_t TAB[sklib::OCTET_ADDRESS_SPAN];
 
-        Proc.generate_inverse_table(TAB);
+        sklib::base64_type::generate_inverse_table(TAB);
 
         for (int k = 0, j = 0; j < 16; j++)
         {
@@ -134,50 +66,63 @@ int wmain(int argn, wchar_t* argc[])
         return 0;
     }
 
-    std::wstring wsinput;
-    for (int k=2; k<argn; k++) wsinput += std::wstring(wsinput.length() ? L" " : L"") + argc[k];
+    if ((int)encode + (int)decode != 1)
+    {
+        std::cout << "Specify either encode or decode, but not combinations\n";
+        return -1;
+    }
+    if ((int)do_read + (int)do_write != 1)
+    {
+        std::cout << "Specify either encode or decode, but not combinations\n";
+        return -1;
+    }
+
+    for (int k = 2; k < argn; k++) STOR += std::string(STOR.length() ? " " : "") + argc[k];
+
+    sklib::base64_type Conv(RD, WR);
 
     if (encode)
     {
-        for (size_t i = 0; i < wsinput.length(); i++)
+        if (do_read)
         {
-            uint16_t data = (uint16_t)wsinput[i];
-            if (!force_ascii) clear_text.push_back((uint8_t(data >> 8)));
-            clear_text.push_back(uint8_t(data & 0xFF));
+            while (true)
+            {
+                int data;
+                if (Conv.read_encode(data))
+                {
+                    std::cout << (char)data;
+                    if (data == Conv.EOL_char) break;
+                }
+            }
+        }
+        if (do_write)
+        {
+            for (size_t k = 0; k < STOR.length(); k++) Conv.write_encode(STOR[k]);
+            Conv.write_encode(EOF);
+        }
+    }
+    if (decode)
+    {
+        if (do_read)
+        {
+            while (true)
+            {
+                int data;
+                if (Conv.read_decode(data))
+                {
+                    if (data < 0) break;
+                    std::cout << (char)data;
+                }
+            }
+        }
+        if (do_write)
+        {
+            for (size_t k = 0; k < STOR.length(); k++) Conv.write_decode(STOR[k]);
+            if (STOR.length() && STOR[STOR.length()-1] != Conv.EOL_char) Conv.write_decode(Conv.EOL_char);
         }
 
-        while (true)
-        {
-            char c = Proc.get_encoded();
-            std::cout << c;
-            if (c == Proc.EOL) break;
-        }
-
-        std::cout << "\n";
-        return 0;
     }
 
-    // if (decode)
-
-    bool status = true;
-    for (size_t i = 0; i < wsinput.length(); i++)
-    {
-        if (!Proc.do_decode(uint8_t(wsinput[i] & 0xFF))) status = false;
-    }
-
-    if (!status) std::cout << "Have decoding error(s)\n";
-
-    if (!force_ascii && (clear_text.size() % 2)) clear_text.push_back(' ');
-
-    for (size_t k = 0; k < clear_text.size(); k++)
-    {
-        uint16_t w = 0;
-        if (!force_ascii) w = (clear_text[k++] << 8);
-        w |= clear_text[k];
-        std::wcout << (wchar_t)w;
-    }
-
-    std::wcout << L"\n";
     return 0;
 }
 

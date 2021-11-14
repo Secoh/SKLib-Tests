@@ -45,11 +45,17 @@ int main()
 
     std::cout << "5\n";
 
-    auto T = 3;
-    time_wait(time_seconds(T));                  // conversion from integer expression
-    time_wait(time_microseconds(exp(T*0.7)));    // conversion from double expression
+    constexpr auto xx = time_milliseconds(3.45);        // double 3.45 ms
+    constexpr auto yy = time_to_microseconds<int>(xx);  // 3450
+    constexpr auto zz = time_seconds(yy);               // int 3450 s
 
-    auto TT = 50_ms_sklib;
+    auto T = 3;
+    auto T1 = time_seconds(T);
+    time_wait(T1);                  // conversion from integer expression
+    auto T2 = time_microseconds(exp(T * 0.7));
+    time_wait(T2);    // conversion from double expression
+
+    constexpr auto TT = 50_ms_sklib;
     auto TF = 100.5_ms_sklib;
     auto TM = 60_minutes_sklib;
 

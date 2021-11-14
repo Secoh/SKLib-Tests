@@ -19,11 +19,11 @@ int main()
 
     std::cout << "Timer 1 is counter, Timer 2 is timeout (10 seconds)\nCommands: 1-Start T1, 2-Stop T1, 3-Reset Both, 0-Exit\n";
 
-    sklib::timer_stopwatch_t timeout(10_s);
-    sklib::timer_stopwatch_t counter(sklib::timer_stopwatch_t::create_mode_t::idle);
+    sklib::timer_stopwatch_type timeout(10_s);
+    sklib::timer_stopwatch_type counter(sklib::timer_stopwatch_type::create_mode_idle);
 
-    sklib::timer_stopwatch_t something_else(sklib::time_milliseconds(300));
-    auto more_something = sklib::timer_stopwatch_t(5.3); /* ms */
+    sklib::timer_stopwatch_type something_else(sklib::time_milliseconds(300));
+    auto more_something = sklib::timer_stopwatch_type(5.3); /* ms */
 
     bool timeout_posted = false;
 

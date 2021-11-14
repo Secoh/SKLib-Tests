@@ -40,25 +40,37 @@ std::pair<uint8_t, uint64_t> generate_node()
 class my_byte_stream : public sklib::bits_stream_base_type
 {
 public:
+    my_byte_stream() : bits_stream_base_type(pop_byte, push_byte) {}
+
     size_t Rpos = 0;
     std::vector<uint8_t> Record;
 
-    void hook_after_reset()
+    void hook_after_reset_impl()
     {
         Rpos = 0;
         Record.clear();
     }
 
-    void push_byte(uint8_t data)
+    static void hook_action(bits_stream_base_type* root, hook_type action)
     {
-        Record.push_back(data);
+        if (action == hook_type::after_reset) static_cast<my_byte_stream*>(root)->hook_after_reset_impl();
     }
 
-    bool pop_byte(uint8_t& data)
+    static void push_byte(bits_stream_base_type* root, uint8_t data)
+    {
+        static_cast<my_byte_stream*>(root)->Record.push_back(data);
+    }
+
+    bool pop_byte_impl(uint8_t& data)
     {
         auto valid = (Rpos < Record.size());
         data = (valid ? Record[Rpos++] : 0);
         return valid;
+    }
+
+    static bool pop_byte(bits_stream_base_type* root, uint8_t& data)
+    {
+        return static_cast<my_byte_stream*>(root)->pop_byte_impl(data);
     }
 };
 
@@ -117,7 +129,7 @@ int main(int argn, char *argc[])
         for (size_t k = 0; k < DLEN; k++)
         {
             auto node = sklib::bits_pack<uint64_t>(0, DATA[k].first);   // we read known count of bits; the received data word must match the log
-            *PACKED >> node;                                            // important: we have to give it specifically the data size: uint64_t
+            *PACKED >> node;                                            // important: we have to declare the data size specifically: uint64_t
             if (node.data != DATA[k].second)
             {
                 std::cout << "\nFailed\n";
