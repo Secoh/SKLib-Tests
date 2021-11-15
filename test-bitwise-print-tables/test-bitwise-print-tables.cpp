@@ -1,6 +1,7 @@
 // Thie purpose of this software is to provide example how to use certain functions of SKLib:
 //     bitwise::rank
 //     bitwise::flip
+//     bitwise::distance
 //
 // Written by Secoh, 2021 // https://github.com/Secoh/SKLib-Tests
 //

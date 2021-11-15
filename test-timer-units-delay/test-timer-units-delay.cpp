@@ -12,7 +12,7 @@
 #include <iostream>
 #include <cmath>
 
-#include <SKLib/timer.hpp>
+#include <SKLib/SKLib.hpp>
 
 void example_with_no_namespace_pollution()
 {
