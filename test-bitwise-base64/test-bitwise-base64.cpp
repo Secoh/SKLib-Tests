@@ -63,16 +63,7 @@ int main(int argn, char *argc[])
 
     if (get_table)
     {
-        uint8_t TAB[sklib::OCTET_ADDRESS_SPAN];
-
-        sklib::base64_type::generate_inverse_table(TAB);
-
-        for (int k = 0, j = 0; j < 16; j++)
-        {
-            for (int i = 0; i < 16; i++) printf(" 0x%02X,", TAB[k++]);
-            printf("\n");
-        }
-
+        sklib::supplement::table256_print("\nBase64 Inverse Table\n", sklib::base64_type::get_inverse_table(), 32);
         return 0;
     }
 

@@ -28,44 +28,12 @@ int main()
         << std::bitset<sklib::supplement::bits_data_width<int32_t>()>(a32) << "\n"
         << std::bitset<sklib::supplement::bits_data_width<int64_t>()>(a64) << "\n";
 
-    uint8_t TAB[sklib::OCTET_ADDRESS_SPAN];
-    char TABC[sklib::OCTET_ADDRESS_SPAN];
+    // Flip, Rank, Distance, Base64
 
-    // Flip
-
-    sklib::supplement::bits_flip_generate_table(TAB);
-
-    std::cout << "\nTable Flip\n\n";
-
-    for (int k = 0, j = 0; j < 16; j++)
-    {
-        for (int i = 0; i < 16; i++) printf(" 0x%02X,", TAB[k++]);
-        printf("\n");
-    }
-
-    // Rank
-
-    sklib::supplement::bits_rank_generate_table(TABC);
-
-    std::cout << "\nTable Rank\n\n";
-
-    for (int k = 0, j = 0; j < 8; j++)
-    {
-        for (int i = 0; i < 32; i++) printf(" %d,", (int)TABC[k++]);
-        printf("\n");
-    }
-
-    // Distance
-
-    sklib::supplement::bits_distance_generate_table(TABC);
-
-    std::cout << "\nTable Distance\n\n";
-
-    for (int k = 0, j = 0; j < 8; j++)
-    {
-        for (int i = 0; i < 32; i++) printf(" %d,", (int)TABC[k++]);
-        printf("\n");
-    }
+    sklib::supplement::table256_print("\nTable Flip\n", sklib::supplement::bits_flip_get_table(), 16, true);
+    sklib::supplement::table256_print("\nTable Rank\n", sklib::supplement::bits_rank_get_table(), 32);
+    sklib::supplement::table256_print("\nTable Distance\n", sklib::supplement::bits_distance_get_table(), 32);
+    sklib::supplement::table256_print("\nTable Base64 Inverse\n", sklib::base64_type::get_inverse_table(), 16, true);
 
     return 0;
 }
