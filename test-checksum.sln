@@ -4,8 +4,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.31424.327
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test-checksum-print-tables", "test-checksum-print-tables\test-checksum-print-tables.vcxproj", "{C645D10B-F80C-4C44-BCFF-5A2FD6FF5AD9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6BE23730-EBAD-47FF-A798-93F782F5DE8E} = {6BE23730-EBAD-47FF-A798-93F782F5DE8E}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sklib", "..\SKLib\sklib\sklib.vcxproj", "{6BE23730-EBAD-47FF-A798-93F782F5DE8E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test-checksum-match", "test-checksum-match\test-checksum-match.vcxproj", "{72ACF857-FB58-40F2-88A2-8997997DE35D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6BE23730-EBAD-47FF-A798-93F782F5DE8E} = {6BE23730-EBAD-47FF-A798-93F782F5DE8E}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +39,14 @@ Global
 		{6BE23730-EBAD-47FF-A798-93F782F5DE8E}.Release|x64.Build.0 = Release|x64
 		{6BE23730-EBAD-47FF-A798-93F782F5DE8E}.Release|x86.ActiveCfg = Release|Win32
 		{6BE23730-EBAD-47FF-A798-93F782F5DE8E}.Release|x86.Build.0 = Release|Win32
+		{72ACF857-FB58-40F2-88A2-8997997DE35D}.Debug|x64.ActiveCfg = Debug|x64
+		{72ACF857-FB58-40F2-88A2-8997997DE35D}.Debug|x64.Build.0 = Debug|x64
+		{72ACF857-FB58-40F2-88A2-8997997DE35D}.Debug|x86.ActiveCfg = Debug|Win32
+		{72ACF857-FB58-40F2-88A2-8997997DE35D}.Debug|x86.Build.0 = Debug|Win32
+		{72ACF857-FB58-40F2-88A2-8997997DE35D}.Release|x64.ActiveCfg = Release|x64
+		{72ACF857-FB58-40F2-88A2-8997997DE35D}.Release|x64.Build.0 = Release|x64
+		{72ACF857-FB58-40F2-88A2-8997997DE35D}.Release|x86.ActiveCfg = Release|Win32
+		{72ACF857-FB58-40F2-88A2-8997997DE35D}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
