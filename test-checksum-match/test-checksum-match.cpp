@@ -1,5 +1,6 @@
 // Thie purpose of this software is to debug certain functions of SKLib, and to provide example how to use them:
-//     checksum::crc_type; crc_fixed_type
+//     checksum::crc_type
+//     checksum::crc_fixed_type
 //
 // Written by Secoh, 2021 // https://github.com/Secoh/SKLib-Tests
 //
