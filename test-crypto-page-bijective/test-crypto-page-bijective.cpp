@@ -28,39 +28,54 @@
 
 //
 
-template<unsigned U>
-struct param_help_type
+namespace sklib
 {
-    const char* head = nullptr;
-    const char* text[U] = { nullptr };
-
-    constexpr param_help_type() = default;
-
-    constexpr param_help_type(const char* hd, const ::sklib::supplement::collection_cstring_type<U>& ld)
-        : head(hd)
-    {
-        ld.fill_array(text);
-    }
-};
-
-struct param_help_receiver_type
-{
-    const char* head = nullptr;
-    const char* const* text = nullptr;
-    unsigned size = 0;
-
+    // Standalone string collection to describe an option in the command line parser
     template<unsigned U>
-    constexpr param_help_receiver_type(const param_help_type<U>& ld)
-        : head(ld.head)
-        , text((U&& ld.text&& ld.text[0]) ? ld.text : nullptr)
-        , size((U && ld.text && ld.text[0]) ? U : 0)
-    {}
-};
+    struct param_help_type
+    {
+        const char* head = nullptr;
+        const char* text[U] = { nullptr };
+
+        // Standalone string collection to describe an option in the command line parser
+        constexpr param_help_type() = default;
+
+        // hd - single line for short description; ld - text page explaining the option
+        constexpr param_help_type(const char* hd, const ::sklib::supplement::collection_cstring_type<U>& ld) : head(hd)
+        {
+            ld.fill_array(text);
+        }
+    };
+
+    namespace internal
+    {
+        struct param_help_receiver_type
+        {
+            const char* head = nullptr;
+            const char* const* text = nullptr;
+            unsigned size = 0;
+
+            template<unsigned U>
+            constexpr param_help_receiver_type(const param_help_type<U>& ld)
+                : head(ld.head)
+                , text((U&& ld.text&& ld.text[0]) ? ld.text : nullptr)
+                , size((U && ld.text && ld.text[0]) ? U : 0)
+            {}
+        };
+    };
+
+
 
 
 class params_table_base_type
 {
-private:
+public:
+    class param_switch;
+    class param_help;
+
+    // === Parser Defaults
+
+private:        //sk! TODO support different platforms
 #ifdef _WIN32
     static void stdout_putc(char c) { putchar(c); }
     static constexpr auto def_putc = stdout_putc;
@@ -68,20 +83,33 @@ private:
     static constexpr auto def_putc = nullptr;
 #endif
 
-public:
-    const char Prefix = '-';
+protected:
+    static constexpr char def_prefix = '-';
+    static constexpr char def_sym_reqd = '*';
+    static constexpr int def_min_help_spacing = 3;  // in help print, width between names column and "required" column
 
-    // help display
+    static constexpr auto def_help_intro = param_help_type(nullptr,
+                      ::sklib::collection_cstring("Named options use: " PARAM_DESG_PREFIX_S "option value   General use of named parameter",
+                                                  "                   " PARAM_DESG_PREFIX_S "option         Without value, if parameter is a switch (presence only)",
+                                                  "Options can be combined in one argument: " PARAM_DESG_PREFIX_S "abc, where a, b, c are different parameters.",
+                                                  "Value can follow the option without space: " PARAM_DESG_PREFIX_S "OptionValue if parsing is not ambiguous.",
+                                                  "Argument without leading \"" PARAM_DESG_PREFIX_S "\" is plain argument. Plain parameters are read one after another.",
+                                                  "Double prefix, \"" PARAM_DESG_PREFIX_S PARAM_DESG_PREFIX_S "\", makes the next argument plain even if it starts with \"" PARAM_DESG_PREFIX_S "\".",
+                                                  "If value in an option starts with prefix symbol, it can also be escaped with preceding \"" PARAM_DESG_PREFIX_S PARAM_DESG_PREFIX_S "\"." ));
 
-    static constexpr int def_min_help_spacing = 3;  // between names column and "required" column
+    // === Hidden Settings and Configuration
+
     const int min_help_spacing = def_min_help_spacing;
+    const char sym_reqd = def_sym_reqd;
+    const ::sklib::internal::param_help_receiver_type descr_intro{ def_help_intro };
 
-    // tweaks in constructor
+    param_switch* param_list_entry = nullptr;
+    const param_help* param_help_entry = nullptr;
 
-    params_table_base_type() = default;
-    params_table_base_type(char option_prefix, int custom_help_spacing = def_min_help_spacing) : Prefix(option_prefix), min_help_spacing(custom_help_spacing) {}
+    // === Open Setting and Parse Status
 
-    // global parser status after reading input
+public:
+    const char Prefix = def_prefix;
 
     unsigned parse_status = 0;
     static constexpr unsigned status_good       = 0x0001;  // indicates that parser has no problems
@@ -92,22 +120,21 @@ public:
     static constexpr unsigned status_unknown    = 0x0020;  // error: unrecognized (or duplicate) parameter(s)
     static constexpr unsigned status_overflow   = 0x0040;  // error: too many plain parameters
 
-    // per-parameter read status
+    // === Constructors
 
-    static constexpr uint8_t param_no_errors     = 0x00;   // option state is correct (even if not present)
-    static constexpr uint8_t param_error_empty   = 0x01;   // option is present but data portion is not
-    static constexpr uint8_t param_error_partial = 0x02;   // data portion shall be read in full but it was not
-    static constexpr uint8_t param_is_help       = 0x80;   // hack: this bit signals that the parameter is used in help subsystem
+    params_table_base_type(char option_prefix = def_prefix, char custom_sym_reqd = def_sym_reqd, int custom_help_spacing = def_min_help_spacing)
+        : params_table_base_type(option_prefix, custom_sym_reqd, custom_help_spacing, def_help_intro) {}
 
-    // parameters list
-
-public:
-    class param_switch;
-    class param_help;
-
-protected:
-    param_switch* param_list_entry = nullptr;
-    const param_help* param_help_entry = nullptr;
+    template<unsigned U>
+    params_table_base_type(char option_prefix,
+                           char custom_sym_reqd,
+                           int custom_help_spacing,
+                           const param_help_type<U>& help_intro)
+        : Prefix(option_prefix)
+        , sym_reqd(custom_sym_reqd)
+        , min_help_spacing(custom_help_spacing)
+        , descr_intro(help_intro)
+    {}
 
     // parameters descriptors
     //
@@ -128,11 +155,16 @@ public:
         bool present = false;
         uint8_t status = param_no_errors;
 
+        static constexpr uint8_t param_no_errors     = 0x00;   // option state is correct (even if not present)
+        static constexpr uint8_t param_error_empty   = 0x01;   // option is present but data portion is not
+        static constexpr uint8_t param_error_partial = 0x02;   // data portion shall be read in full but it was not
+        static constexpr uint8_t param_is_help       = 0x80;   // hack: this bit signals that the parameter is used in help subsystem
+
     protected:
         const char* const name = "";
         const unsigned name_len = 0;
         const bool required = false;
-        const param_help_receiver_type descr;
+        const ::sklib::internal::param_help_receiver_type descr;
         param_switch* const next = nullptr;
 
         static constexpr auto help_null = param_help_type<1>();
@@ -451,11 +483,11 @@ protected:
 
         if (same_argument)
         {
-            if (value_start == value_end) select->status |= param_error_empty;   // if value is not read
+            if (value_start == value_end) select->status |= param_switch::param_error_empty;   // if value is not read
             return (int)(value_end - opt);
         }
 
-        if (value_end - value_start != ::sklib::strlen(next)) select->status |= param_error_partial;  // only the body of the value must be in the string, otherwise it is error
+        if (value_end - value_start != ::sklib::strlen(next)) select->status |= param_switch::param_error_partial;  // only the body of the value must be in the string, otherwise it is error
         return -1;
     }
 
@@ -474,7 +506,7 @@ protected:
         select->present = true;
 
         auto value_end = select->decode(opt);
-        if (!value_end || value_end - opt != ::sklib::strlen(opt)) select->status |= param_error_partial;  // only the body of the value must be in the string, otherwise it is error
+        if (!value_end || value_end - opt != ::sklib::strlen(opt)) select->status |= param_switch::param_error_partial;  // only the body of the value must be in the string, otherwise it is error
 
         return true;
     }
@@ -491,7 +523,7 @@ protected:
         param_help_entry->write(Prefix);
         param_help_entry->write(name);
         for (int i=0;i<spacer; i++) param_help_entry->write(" ");
-        param_help_entry->write(required ? '*' : ' ');
+        param_help_entry->write(required ? sym_reqd : ' ');
         param_help_entry->write(' ');
         param_help_entry->writeln(head, name);
     }
@@ -608,8 +640,8 @@ public:
             if (ptr->present)
             {
                 event_present = true;
-                if (ptr->status & param_is_help) event_help = true;
-                if (ptr->status & ~param_is_help) parse_status |= status_errors;
+                if (ptr->status & param_switch::param_is_help) event_help = true;
+                if (ptr->status & ~param_switch::param_is_help) parse_status |= status_errors;
             }
             else
             {
@@ -657,7 +689,7 @@ public:
 
             max_name_length = std::max(max_name_length, subject_ptr->name_len);
 
-            if (subject_ptr->present && !(subject_ptr->status & param_is_help))
+            if (subject_ptr->present && !(subject_ptr->status & param_switch::param_is_help))
             {
                 help_show_for_one_param(subject_ptr);
                 return true;
@@ -665,6 +697,22 @@ public:
         }
 
         // else, help alone - print list of all options
+        // first, print intro, if requested
+
+        if (descr_intro.head)
+        {
+            param_help_entry->writeln(descr_intro.head);
+        }
+        else if (descr_intro.text)
+        {
+            for (unsigned k = 0; k < descr_intro.size; k++) param_help_entry->writeln(descr_intro.text[k]);
+        }
+
+        // then, print the list of options
+
+        param_help_entry->write("Available options: (");
+        param_help_entry->write(sym_reqd);
+        param_help_entry->writeln(" if required)");
 
         depth = -1;
         while (true)
@@ -682,6 +730,14 @@ public:
         return true;
     }
 };
+
+
+
+
+
+
+};
+
 
 
 
@@ -726,7 +782,7 @@ DECLARE_CMD_PARAMS(test_list)
 
 //IMPLEMENT_CMD_PARAMS(test_list) PPP;
 
-struct test_list : public params_table_base_type
+struct test_list : public sklib::params_table_base_type
 {
     param_switch a{ this, "a", true };
     param_switch b{ this, "b" };
@@ -753,8 +809,6 @@ int main(int argn, char *argc[])
 
     if (PPP.parse_status & PPP.status_help)
     {
-        std::cout << "hlp>\n";
-//        PPP.hh.show();
         PPP.show_help();
     }
 }
