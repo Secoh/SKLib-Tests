@@ -633,7 +633,7 @@ namespace sklib
 
             if (param_help_entry->value && *param_help_entry->value)
             {
-                auto subject_ptr = this->find_named_param(param_help_entry->value).first;
+                auto subject_ptr = this->find_param(param_help_entry->value).first;
                 if (!subject_ptr)
                 {
                     this->help_diagnistics("This option doesn\'t exist:", param_help_entry->value);
@@ -651,7 +651,7 @@ namespace sklib
             int depth = -1;
             while (true)
             {
-                auto entry = this->find_named_param(nullptr, depth);
+                auto entry = this->find_param(nullptr, depth);
                 depth = entry.second;
 
                 auto subject_ptr = entry.first;
@@ -687,14 +687,28 @@ namespace sklib
             depth = -1;
             while (true)
             {
-                auto entry = this->find_named_param(nullptr, depth);
+                auto entry = this->find_param(nullptr, depth);
                 depth = entry.second;
 
                 auto subject_ptr = entry.first;
                 if (!subject_ptr) break;
 
                 int spacing = min_help_spacing + max_name_length - subject_ptr->name_len;
-                this->help_prhead(subject_ptr->name, spacing, subject_ptr->required, (subject_ptr ? subject_ptr->descr.head : nullptr));
+                this->help_prhead(subject_ptr->name, spacing, subject_ptr->required, subject_ptr->descr.head);
+            }
+
+            param_help_entry->writeln("Plain parameters:");
+
+            depth = -1;
+            while (true)
+            {
+                auto entry = this->find_param("", depth);
+                depth = entry.second;
+
+                auto subject_ptr = entry.first;
+                if (!subject_ptr) break;
+
+                this->help_prhead(nullptr, 1, subject_ptr->required, (subject_ptr->descr.head ? subject_ptr->descr.head : "< no description >"));
             }
 
             return true;
@@ -705,17 +719,18 @@ namespace sklib
     protected:
         // find the param_switch entry in the L1 list
         // criteria for selection: most distant, name match, and depth is strictly less than the given depth
-        // if name is a null, any name is a match; if depth limit is negative, any depth is a match
+        // if name is a null, any non-empty name is a match; if name is not null, exact match is tested
+        // if depth limit is negative, any depth is a match
         // returns pointer to the element or null if not found;
         // returns the current depth of the found element or negative if not found
-        std::pair<const param_switch*, int> find_named_param(const char* name, int depth_cap = -1) const
+        std::pair<const param_switch*, int> find_param(const char* name, int depth_cap = -1) const
         {
             int depth = 0;
             int depth_seen = -1;
             param_switch* ptr_select = nullptr;
             for (param_switch* ptr = param_list_entry; ptr && (depth_cap < 0 || depth < depth_cap); depth++, ptr = ptr->next)
             {
-                if (ptr->name_len && (!name || ::sklib::strequ(name, ptr->name)))   // must have name, *and* either take any, or the name match
+                if (name ? ::sklib::strequ(name, ptr->name) : ptr->name_len)
                 {
                     depth_seen = depth;
                     ptr_select = ptr;
@@ -798,7 +813,7 @@ namespace sklib
         }
         void help_prhead(const char* name, int spacer, bool required, const char* head) const
         {
-            param_help_entry->write(Prefix);
+            if (name) param_help_entry->write(Prefix);
             param_help_entry->write(name);
             for (int i=0;i<spacer; i++) param_help_entry->write(" ");
             param_help_entry->write(required ? sym_reqd : ' ');
@@ -846,6 +861,9 @@ namespace sklib
 
 DECLARE_OPTION_HELP(help_b, "demo B", "Lorem", "ipsum", "dolor");
 
+DECLARE_OPTION_HELP(help_p1, "input");
+DECLARE_OPTION_HELP(help_p2, "output");
+
 DECLARE_CMD_PARAMS(test_list)
 {
 
@@ -857,8 +875,8 @@ DECLARE_CMD_PARAMS(test_list)
     PARAM_KEY(za);
     OPTION_STRING(src, "defsrc");
 
-    PLAIN_STRING(r1, "aaa");
-    PLAIN_STRING(r2, "bbb");
+    PLAIN_STRING(r1, "aaa", help_p1);
+    PLAIN_STRING(r2, "bbb", help_p2);
     PLAIN_OPT_INT(d1, 987);
 
     OPTION_HELP(h);
