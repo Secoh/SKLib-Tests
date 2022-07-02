@@ -40,7 +40,6 @@ SKLIB_DECLARE_CMD_PARAMS(test_list)
     SKLIB_OPTION_HELP(h);
 
 //    SKLIB_PARAMS_ALT_PREFIX('?');       // <-- uncomment to change Prefix
-    SKLIB_PARAMS_ALT_BANNER(ppp_banner);
 }
 PPP;
 
