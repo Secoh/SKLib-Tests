@@ -10,5 +10,5 @@
 
 #pragma once
 
-void test_stoi();
+void test_stoi(const char *str);
 

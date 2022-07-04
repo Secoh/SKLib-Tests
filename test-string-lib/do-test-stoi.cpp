@@ -14,11 +14,27 @@
 
 #include <iostream>
 
-void test_stoi()
+void test_stoi(const char* str)
 {
-    int p;
-    int q = (int)stoi<double>(L"129=", &p);
+    int p1, p2, p4, p8, up1, up2, up4, up8, pd;
+    auto v1 = sklib::stoi<char>(str, &p1);
+    auto uv1 = sklib::stoi<unsigned char>(str, &up1);
+    auto v2 = sklib::stoi<int16_t>(str, &p2);
+    auto uv2 = sklib::stoi<uint16_t>(str, &up2);
+    auto v4 = sklib::stoi<int32_t>(str, &p4);
+    auto uv4 = sklib::stoi<uint16_t>(str, &up4);
+    auto v8 = sklib::stoi<int64_t>(str, &p8);
+    auto uv8 = sklib::stoi<uint64_t>(str, &up8);
+    auto vd = sklib::stoi<double>(str, &pd);
 
-    std::cout << q << ", " << p << "\n";
+    std::cout << (int)v1 << ", " << p1 << "\n"
+              << (int)uv1 << ", " << up1 << "\n"
+              << (int)v2 << ", " << p2 << "\n"
+              << (int)uv2 << ", " << up2 << "\n"
+              << v4 << ", " << p4 << "\n"
+              << uv4 << ", " << up4 << "\n"
+              << v8 << ", " << p8 << "\n"
+              << uv8 << ", " << up8 << "\n"
+              << vd << ", " << pd << "\n";
 }
 

@@ -11,11 +11,14 @@
 #include <iostream>
 #include "do-test-stoi.h"
 
-int main()
+int main(int argn, const char *argc[])
 {
     std::cout << "Hello World!\n";
 
-    test_stoi();
+    if (argn > 1) test_stoi(argc[1]);
+    else std::cout << argc[0] << " number\n";
+
+    return 0;
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
