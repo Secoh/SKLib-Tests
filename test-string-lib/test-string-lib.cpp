@@ -15,8 +15,15 @@ int main(int argn, const char *argc[])
 {
     std::cout << "Hello World!\n";
 
-    if (argn > 1) test_stoi(argc[1]);
-    else std::cout << argc[0] << " number\n";
+    if (argn > 1)
+    {
+        test_stoi(argc[1]);
+        test_strcmp(argc[1]);
+    }
+    else
+    {
+        std::cout << argc[0] << " number\n";
+    }
 
     return 0;
 }

@@ -10,7 +10,8 @@
 
 #include "do-test-stoi.h"
 
-#include <SKLib/string.hpp>
+//#include <SKLib/sklib.hpp>
+#include <SKLib/include/string.hpp>
 
 #include <iostream>
 
@@ -36,5 +37,18 @@ void test_stoi(const char* str)
               << v8 << ", " << p8 << "\n"
               << uv8 << ", " << up8 << "\n"
               << vd << ", " << pd << "\n";
+}
+
+void test_strcmp(const char* str)
+{
+    const auto zzz = sklib::strancmp(L"vvvc", "vVv", 3);
+    const auto xxx = sklib::strlen(L"abcd");
+    const auto yyy = sklib::strabeg(L"vvvc", "vVv");
+
+    const auto sss = sklib::stod<double>("0xabpe");
+
+    std::cout << sklib::strlen(str) << ", "
+              << sklib::straequ(str, L"aBcD") << ", "
+              << sklib::strcmp(str, L"aBcD") << "\n";
 }
 
