@@ -46,6 +46,7 @@ void test_strcmp(const char* str)
     const auto yyy = sklib::strabeg(L"vvvc", "vVv");
 
     const auto sss = sklib::stod<double>("0xabpe");
+    const auto uuu = sklib::stod<long double>("31.25e-3");
 
     std::cout << sklib::strlen(str) << ", "
               << sklib::straequ(str, L"aBcD") << ", "
