@@ -179,11 +179,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="do-test-stoi.cpp" />
+    <ClCompile Include="do-tests.cpp" />
     <ClCompile Include="test-string-lib.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="do-test-stoi.h" />
+    <ClInclude Include="do-tests.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

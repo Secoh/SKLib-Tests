@@ -1,5 +1,5 @@
 // Thie purpose of this software is to debug certain functions of SKLib, and to provide example how to use them:
-//     string::stoi
+//     string library
 //
 // Written by Secoh, 2022 // https://github.com/Secoh/SKLib-Tests
 //
@@ -8,7 +8,7 @@
 // For more information, please refer to: http://unlicense.org/
 //
 
-#include "do-test-stoi.h"
+#include "do-tests.h"
 
 //#include <SKLib/sklib.hpp>
 #include <SKLib/include/string.hpp>
@@ -28,15 +28,19 @@ void test_stoi(const char* str)
     auto uv8 = sklib::stoi<uint64_t>(str, &up8);
     auto vd = sklib::stoi<double>(str, &pd);
 
-    std::cout << (int)v1 << ", " << p1 << "\n"
-              << (int)uv1 << ", " << up1 << "\n"
-              << (int)v2 << ", " << p2 << "\n"
-              << (int)uv2 << ", " << up2 << "\n"
-              << v4 << ", " << p4 << "\n"
-              << uv4 << ", " << up4 << "\n"
-              << v8 << ", " << p8 << "\n"
-              << uv8 << ", " << up8 << "\n"
-              << vd << ", " << pd << "\n";
+    int16_t p_stod;
+    auto v_stod = sklib::stod<double>(str, &p_stod);
+
+    std::cout << "char: " << (int)v1 << ", " << p1 << "\n"
+              << "uchar: " << (int)uv1 << ", " << up1 << "\n"
+              << "int16: " << (int)v2 << ", " << p2 << "\n"
+              << "uint16: " << (int)uv2 << ", " << up2 << "\n"
+              << "int32: " << v4 << ", " << p4 << "\n"
+              << "uint32: " << uv4 << ", " << up4 << "\n"
+              << "int64: " << v8 << ", " << p8 << "\n"
+              << "uint64: " << uv8 << ", " << up8 << "\n"
+              << "stoi/f: " << vd << ", " << pd << "\n"
+              << "stod: " << v_stod << ", " << p_stod << "\n";
 }
 
 void test_strcmp(const char* str)
@@ -48,8 +52,9 @@ void test_strcmp(const char* str)
     const auto sss = sklib::stod<double>("0xabpe");
     const auto uuu = sklib::stod<long double>("31.25e-3");
 
-    std::cout << sklib::strlen(str) << ", "
-              << sklib::straequ(str, L"aBcD") << ", "
-              << sklib::strcmp(str, L"aBcD") << "\n";
+    std::cout << "strlen:" << sklib::strlen(str) << ", "
+              << "straequ/L_aBcD:" << sklib::straequ(str, L"aBcD") << ", "
+              << "strcmp/L_aBcD:" << sklib::strcmp(str, L"aBcD") << ", "
+              << "strancmp/U_aBcD/3:" << sklib::strancmp(str, U"aBcD", 3) << "\n";
 }
 

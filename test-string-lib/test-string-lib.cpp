@@ -9,7 +9,7 @@
 //
 
 #include <iostream>
-#include "do-test-stoi.h"
+#include "do-tests.h"
 
 int main(int argn, const char *argc[])
 {

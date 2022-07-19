@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-#include <Sklib/helpers.hpp>
+#include <Sklib/include/string.hpp>
 
 
 //sk! add #error if compiled not in Windows
@@ -44,13 +44,13 @@ public:
             // error if the pattern is not satisfied
 
             uint32_t content = (carry_unicode & ~occupied_flag);
-            if (!::sklib::unicode::is_high_surrogate(content)) return false;
+            if (!::sklib::is_unicode_high_surrogate(content)) return false;
 
-            if (::sklib::unicode::is_low_surrogate(ch))
+            if (::sklib::is_unicode_low_surrogate(ch))
             {
 //              carry_unicode = (content - ::sklib::unicode::HIGH_SURROGATE) * 0x0400u + (ch - ::sklib::unicode::LOW_SURROGATE) + 0x10000 + occupied_flag;  // UTF-16 definition
 //                carry_unicode = (content - ::sklib::unicode::HIGH_SURROGATE) * 0x0400u + ch + (0x10000 + occupied_flag - ::sklib::unicode::LOW_SURROGATE);  // lets rearrange a little
-                carry_unicode = ::sklib::unicode::supplement::utf16_combine(content, ch) + occupied_flag;
+                carry_unicode = ::sklib::supplement::utf16_combine(content, ch) + occupied_flag;
             }
             else
             {
@@ -62,7 +62,7 @@ public:
         else
         {
             // low surrogate cannot go first
-            carry_unicode = (::sklib::unicode::is_low_surrogate(ch) ? ::sklib::unicode::REPLACEMENT_MARK : ch) + occupied_flag;
+            carry_unicode = (::sklib::is_unicode_low_surrogate(ch) ? ::sklib::unicode::REPLACEMENT_MARK : ch) + occupied_flag;
         }
 
         return true;
@@ -72,7 +72,7 @@ public:
     {
         if (!(carry_unicode & occupied_flag)) return false;
         uint32_t data = (carry_unicode & ~occupied_flag);
-        if (::sklib::unicode::is_surrogate(data)) return false;
+        if (::sklib::is_unicode_surrogate(data)) return false;
         ch = data;
         carry_unicode = 0;
         return true;
@@ -86,7 +86,7 @@ public:
     bool put_unicode(uint32_t ch)
     {
         if (carry_unicode & occupied_flag) return false;
-        bool valid = (::sklib::unicode::is_unicode(ch) && !::sklib::unicode::is_surrogate(ch));
+        bool valid = (::sklib::is_unicode(ch) && !::sklib::is_unicode_surrogate(ch));
         carry_unicode = (valid ? ch : ::sklib::unicode::REPLACEMENT_MARK) + occupied_flag;
         return true;
     }
@@ -96,14 +96,14 @@ public:
         if (!(carry_unicode & occupied_flag)) return false;
 
         uint32_t data = (carry_unicode & ~occupied_flag);
-        if (::sklib::unicode::is_bmp(data))
+        if (::sklib::is_unicode_bmp(data))
         {
             ch = data;          // that includes leftover low surrogate, if is was pair
             carry_unicode = 0;
             return true;
         }
 
-        auto utf16_pair = ::sklib::unicode::supplement::utf16_split(data);
+        auto utf16_pair = ::sklib::supplement::utf16_split(data);
         carry_unicode = utf16_pair.second + occupied_flag;
         ch = utf16_pair.first;
         return true;
