@@ -11,7 +11,7 @@
 #include <iostream>
 #include <conio.h>
 
-#include <SKLib/comms.hpp>
+#include <SKLib/include/comms.hpp>
 
 #define TESTPORT 13579
 #define ESC 0x1B
