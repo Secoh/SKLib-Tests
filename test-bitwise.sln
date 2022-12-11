@@ -13,7 +13,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test-bitwise-stream", "test
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test-bitwise-base64", "test-bitwise-base64\test-bitwise-base64.vcxproj", "{AECC22B0-0F6C-4D13-A22F-F0989456CC01}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sklib", "..\SKLib\sklib\sklib.vcxproj", "{6BE23730-EBAD-47FF-A798-93F782F5DE8E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sklib", "..\SKLib\sklib.vcxproj", "{6BE23730-EBAD-47FF-A798-93F782F5DE8E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
