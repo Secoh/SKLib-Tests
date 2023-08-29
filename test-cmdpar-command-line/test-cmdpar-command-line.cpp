@@ -16,18 +16,21 @@
 //  test [-a][-b][-ur] -z<char> -za<char> arg1 arg2 [num1]
 SKLIB_DECLARE_CMD_PARAMS(test_list)
 {
-    param_switch<char> nnn{ this, "nnn" };
+//    param_switch<char> nnn{ this, "nnn" };
 
     SKLIB_OPTION_SWITCH(a);
     SKLIB_OPTION_SWITCH(b);
     SKLIB_OPTION_SWITCH(ur);
 
+    SKLIB_PARAM_DOUBLE(f, 3.1416);
+    SKLIB_OPTION_DOUBLE(fz, 2.71);
+    SKLIB_PARAM_INT(i);
+
     SKLIB_PARAM_KEY(z, '0');
     SKLIB_PARAM_KEY(za);
     SKLIB_OPTION_STRING(src, "defsrc");
 
-    SKLIB_OPTION_DOUBLE(f, 3.1416);
-
+/*
     SKLIB_PLAIN_STRING(r1, "aaa");
     SKLIB_PLAIN_STRING(r2, "bbb");
     SKLIB_PLAIN_OPTION_INT(d1, 987);
@@ -35,8 +38,8 @@ SKLIB_DECLARE_CMD_PARAMS(test_list)
     SKLIB_OPTION_SWITCH_NAME(palka, L"палка");   // palka in Russian (English: stick)
 
     SKLIB_OPTION_HELP(h);
-
-//    SKLIB_PARAMS_ALT_PREFIX('?');       // <-- uncomment to change Prefix
+*/
+    SKLIB_PARAMS_ALT_PREFIX('?');       // <-- uncomment to change Prefix
 }
 PPP;
 
@@ -47,9 +50,11 @@ std::wstring str_AtoW(const std::string& str)
     return wstr;
 }
 
-void show_option_status(const char* tstr, const test_list::param_base& param)
+typedef ::sklib::implementation::cmdpar_param_base<char> param_base;
+
+void show_option_status(const char* tstr, const param_base& param)
 {
-    typedef typename std::decay_t<decltype(param)>::option_flag option_flag;    // "using" equivalent
+    typedef ::sklib::cmdpar_option_flags option_flag;    // "using" equivalent
 
     std::cout << "> ";
 
@@ -57,13 +62,13 @@ void show_option_status(const char* tstr, const test_list::param_base& param)
     if (s1) while (sklib::is_c_name_token(*++s1)) std::cout << *s1;
     else std::cout << tstr;
 
-    if (!param.status())                             std::cout << "; No Options";
-    if (param.status() & option_flag::required)      std::cout << "; Required";
-    if (param.status() & option_flag::present)       std::cout << "; Present";
-    if (param.status() & option_flag::is_help)       std::cout << "; Option is Help";
-    if (param.status() & option_flag::help_request)  std::cout << "; Help Requested";
-    if (param.status() & option_flag::error_empty)   std::cout << "; Error: Empty";
-    if (param.status() & option_flag::error_partial) std::cout << "; Error: Partial";
+    if (!param.get_status())                             std::cout << "; No Options";
+    if (param.get_status() & option_flag::required)      std::cout << "; Required";
+    if (param.get_status() & option_flag::present)       std::cout << "; Present";
+    if (param.get_status() & option_flag::is_help)       std::cout << "; Option is Help";
+    if (param.get_status() & option_flag::help_request)  std::cout << "; Help Requested";
+    if (param.get_status() & option_flag::error_empty)   std::cout << "; Error: Empty";
+    if (param.get_status() & option_flag::error_partial) std::cout << "; Error: Partial";
     std::cout << "\n";
 }
 
@@ -71,19 +76,19 @@ auto check_name(const char* name) { return (name && *name) ? name : "<plain>"; }
 auto check_name(const wchar_t* name) { return (name && *name) ? name : L"<plain>"; }
 
 template<class T>
-void show_param(const test_list::param_base& param, const char* tstr, const char* name, const T& value)
+void show_param(const param_base& param, const char* tstr, const char* name, const T& value)
 {
     std::cout << check_name(name) << " = " << value << "  --";  // "\n"
     show_option_status(tstr, param);
 }
 template<class T>
-void show_param(const test_list::param_base& param, const char* tstr, const wchar_t* name, const T value)
+void show_param(const param_base& param, const char* tstr, const wchar_t* name, const T value)
 {
     std::wcout << check_name(name) << L" = " << value << L"  --";
     show_option_status(tstr, param);
 }
 template<>
-void show_param(const test_list::param_base& param, const char* tstr, const wchar_t* name, const char* value)
+void show_param(const param_base& param, const char* tstr, const wchar_t* name, const char* value)
 {
     std::wcout << check_name(name) << L" = " << str_AtoW(value) << L"  --";
     show_option_status(tstr, param);
@@ -91,11 +96,11 @@ void show_param(const test_list::param_base& param, const char* tstr, const wcha
 
 void show_parser_status(bool ok, const test_list& root)
 {
-    typedef typename std::decay_t<decltype(root.parser_status)>::flags parser_flag;    // another "using"
+    typedef ::sklib::cmdpar_parser_flags parser_flag;    // another "using"
 
     std::cout << (ok ? "Parse OK\n" : "Parse Bad\n");
 
-    auto status = root.parser_status.get();
+    auto status = root->get_status();
 
     if (status & parser_flag::good)                 std::cout << "Params Valid\n";
     if (status & parser_flag::empty)                std::cout << "Empty Input\n";
@@ -115,7 +120,7 @@ void show_parser_status(bool ok, const test_list& root)
 
 int main(int argn, char* argc[])
 {
-    bool is_ok = PPP.parser_run(argn, argc);
+    bool is_ok = PPP(argn, argc);
 
     show_parser_status(is_ok, PPP);
 
@@ -123,19 +128,26 @@ int main(int argn, char* argc[])
     SHOW_PARAM(PPP.a);
     SHOW_PARAM(PPP.b);
     SHOW_PARAM(PPP.ur);
-    SHOW_PARAM(PPP.z);
-    SHOW_PARAM(PPP.za);
-    SHOW_PARAM(PPP.src);
-    SHOW_PARAM(PPP.nnn);
     SHOW_PARAM(PPP.f);
+    SHOW_PARAM(PPP.fz);
+    SHOW_PARAM(PPP.i);
+    SHOW_PARAM(PPP.z);
+    SHOW_PARAM(PPP.src);
+
+/*
+    SHOW_PARAM(PPP.za);
+    SHOW_PARAM(PPP.nnn);
     SHOW_PARAM(PPP.h);
     SHOW_PARAM(PPP.r1);
     SHOW_PARAM(PPP.r2);
     SHOW_PARAM(PPP.d1);
+*/
 
-    const auto pflag = PPP.parser_status.flag.good;     // another way to access parser flags
+    const auto pflag = PPP->get_status();     // another way to access parser flags
 
-    const auto oflag = decltype(PPP)::param_uint<wchar_t>::param_base::option_flag::is_help;  // example of inheritance chain
+  //  const auto oflag = decltype(PPP)::param_uint<wchar_t>::param_base::option_flag::is_help;  // example of inheritance chain
+
+    PPP->reset();
 
 }
 
