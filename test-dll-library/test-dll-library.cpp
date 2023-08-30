@@ -11,27 +11,62 @@
 
 #include "pch.h"
 #include <iostream>
+#include <cmath>
 
 
 #define SKLIB_DLL_EXPORT
 #include "test-dll-library.h"
 
 
-SKLIB_DLL_FUNC(int, add, int a, int b)
-{
+// internal shortcuts, to keep it valid for both enabled/disabled data segnemt
 #ifdef SKLIB_DLL_ENABLE_INSTANCE_DATA_SEGMENT
-    double x = INSTANCE_DATA->fff;
+#define IMPL_CARRY (INSTANCE_DATA->carry)
 #else
-    double x = 0;
+#define IMPL_CARRY 0
 #endif
 
-    std::cout << "Dll called: add()\n";
-    return a + b + (int)x;
-}
-
-
-SKLIB_DLL_FUNC(int, coco)
+SKLIB_DLL_FUNC(int, add, int a, int b)
 {
-    return 333;
+    auto c = IMPL_CARRY;
+    IMPL_CARRY = 0;
+    return a + b + c;
 }
+
+SKLIB_DLL_FUNC(int, sub, int a, int b)
+{
+    auto c = IMPL_CARRY;
+    IMPL_CARRY = 0;
+    return a - b - c;
+}
+
+
+// Same idea, without shortcut
+
+#ifdef SKLIB_DLL_ENABLE_INSTANCE_DATA_SEGMENT
+SKLIB_DLL_FUNC_OPT(int, coco)
+{
+    return std::lround(100 / INSTANCE_DATA->fcoco);
+}
+#else
+SKLIB_DLL_FUNC_OPT(int, coco)
+{
+    return -1;
+}
+#endif
+
+
+// Functions below are supported only if data segment is present.
+// Normally, the user of the dll library shall select the operating mode, and adhere to it at all times.
+
+#ifdef SKLIB_DLL_ENABLE_INSTANCE_DATA_SEGMENT
+SKLIB_DLL_FUNC_OPT(void, put, const char* str)
+{
+    INSTANCE_DATA->payload = str;
+}
+
+SKLIB_DLL_FUNC_OPT(const char*, get)
+{
+    return INSTANCE_DATA->payload.c_str();  // const pointer has extended lifetime ?!
+}
+#endif
 

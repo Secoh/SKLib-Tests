@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="test-dll-caller.cpp">
+    <ClCompile Include="test-dll-selector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="sklib-compilation-unit.cpp">

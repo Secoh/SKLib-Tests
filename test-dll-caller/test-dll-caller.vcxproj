@@ -100,7 +100,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <AssemblerOutput>All</AssemblerOutput>
-      <AssemblerListingLocation>$(OutDir)asm\</AssemblerListingLocation>
+      <AssemblerListingLocation>$(OutDir)asm\$(TargetName)\</AssemblerListingLocation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -120,7 +120,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..</AdditionalIncludeDirectories>
       <AssemblerOutput>All</AssemblerOutput>
-      <AssemblerListingLocation>$(OutDir)asm\</AssemblerListingLocation>
+      <AssemblerListingLocation>$(OutDir)asm\$(TargetName)\</AssemblerListingLocation>
       <TreatWarningAsError>true</TreatWarningAsError>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
@@ -144,7 +144,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <AssemblerOutput>All</AssemblerOutput>
-      <AssemblerListingLocation>$(OutDir)asm\</AssemblerListingLocation>
+      <AssemblerListingLocation>$(OutDir)asm\$(TargetName)\</AssemblerListingLocation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -164,7 +164,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..</AdditionalIncludeDirectories>
       <AssemblerOutput>All</AssemblerOutput>
-      <AssemblerListingLocation>$(OutDir)asm\</AssemblerListingLocation>
+      <AssemblerListingLocation>$(OutDir)asm\$(TargetName)\</AssemblerListingLocation>
       <TreatWarningAsError>true</TreatWarningAsError>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
@@ -179,7 +179,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="sklib-dll-compilation-unit.cpp" />
+    <ClCompile Include="sklib-compilation-unit.cpp" />
     <ClCompile Include="test-dll-caller.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

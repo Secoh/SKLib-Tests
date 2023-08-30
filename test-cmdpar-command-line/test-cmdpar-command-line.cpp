@@ -11,13 +11,13 @@
 
 #include <iostream>
 
+//#define SKLIB_CMDPAR_PARAM_PREFIX par_
+
 #include <SKLib/include/cmdpar.hpp>
 
 //  test [-a][-b][-ur] -z<char> -za<char> arg1 arg2 [num1]
 SKLIB_DECLARE_CMD_PARAMS(test_list)
 {
-//    param_switch<char> nnn{ this, "nnn" };
-
     SKLIB_OPTION_SWITCH(a);
     SKLIB_OPTION_SWITCH(b);
     SKLIB_OPTION_SWITCH(ur);
@@ -25,21 +25,22 @@ SKLIB_DECLARE_CMD_PARAMS(test_list)
     SKLIB_PARAM_DOUBLE(f, 3.1416);
     SKLIB_OPTION_DOUBLE(fz, 2.71);
     SKLIB_PARAM_INT(i);
-
     SKLIB_PARAM_KEY(z, '0');
     SKLIB_PARAM_KEY(za);
     SKLIB_OPTION_STRING(src, "defsrc");
 
-/*
     SKLIB_PLAIN_STRING(r1, "aaa");
     SKLIB_PLAIN_STRING(r2, "bbb");
-    SKLIB_PLAIN_OPTION_INT(d1, 987);
 
-    SKLIB_OPTION_SWITCH_NAME(palka, L"палка");   // palka in Russian (English: stick)
+    SKLIB_PLAIN_INT_OPTIONAL(d1, 987);
+
+//    SKLIB_OPTION_SWITCH_ALT_NAME(palka, L"палка");   // palka in Russian (English: stick)
 
     SKLIB_OPTION_HELP(h);
-*/
-    SKLIB_PARAMS_ALT_PREFIX('?');       // <-- uncomment to change Prefix
+
+    SKLIB_CMD_PARAMS_ALT_PREFIX('?');       // <-- uncomment to change Prefix
+
+    SKLIB_CMD_PARAMS_INITIALIZER(test_list);
 }
 PPP;
 
@@ -120,7 +121,9 @@ void show_parser_status(bool ok, const test_list& root)
 
 int main(int argn, char* argc[])
 {
-    bool is_ok = PPP(argn, argc);
+//    bool is_ok = PPP(argn, argc);
+    test_list PPP(argn, argc);
+    bool is_ok = PPP->is_good();
 
     show_parser_status(is_ok, PPP);
 
@@ -132,22 +135,22 @@ int main(int argn, char* argc[])
     SHOW_PARAM(PPP.fz);
     SHOW_PARAM(PPP.i);
     SHOW_PARAM(PPP.z);
-    SHOW_PARAM(PPP.src);
-
-/*
     SHOW_PARAM(PPP.za);
-    SHOW_PARAM(PPP.nnn);
+    SHOW_PARAM(PPP.src);
     SHOW_PARAM(PPP.h);
     SHOW_PARAM(PPP.r1);
     SHOW_PARAM(PPP.r2);
     SHOW_PARAM(PPP.d1);
-*/
+//    SHOW_PARAM(PPP.palka);
 
     const auto pflag = PPP->get_status();     // another way to access parser flags
 
   //  const auto oflag = decltype(PPP)::param_uint<wchar_t>::param_base::option_flag::is_help;  // example of inheritance chain
 
     PPP->reset();
+
+//bug: unicode
+//bug: test-cmdpar-command-line.exe ?i-34f7 ?src ZZZ ?zk tt
 
 }
 

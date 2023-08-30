@@ -14,15 +14,19 @@
 
 int main()
 {
-    example_type EX("test-dll-library.dll");
+    dll_sample_type EX("test-dll-library.dll");
 
-//    EX->fff = 7.77;
+//    EX->fcoco = 7.77;
 //    decltype(EX.add)::dll_function_entry::ptr_func_type
 //    example_type::sklib_internal_dll_interface_type::
 
     std::cout << "ok? " << EX().is_dll_usable() << "\n";
 
     std::cout << EX.add(2, 3) << " " << EX.coco() << "\n";
+
+    EX.iTest() = 7;
+    EX.iTest() += 3;
+    auto aa = EX.iTest();
 }
 
 
