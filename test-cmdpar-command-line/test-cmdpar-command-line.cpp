@@ -150,7 +150,6 @@ int main(int argn, char* argc[])
     PPP->reset();
 
 //bug: unicode
-//bug: test-cmdpar-command-line.exe ?i-34f7 ?src ZZZ ?zk tt
 
 }
 
