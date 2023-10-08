@@ -15,13 +15,13 @@
 #include <ctime>
 #include <chrono>
 
-#include <SKLib/bitwise.hpp>
+#include <SKLib/sklib.hpp>
 
 int main()
 {
     // prepare
 
-    size_t DLEN = sklib::supplement::bits_data_high_half<uint16_t>();
+    size_t DLEN = sklib::bits_high_half_v<uint16_t>;
     uint8_t* DATA = new uint8_t[DLEN];
     srand((unsigned)time(nullptr));
     for (size_t i = 0; i < DLEN; i++) DATA[i] = (rand() % 0x100);

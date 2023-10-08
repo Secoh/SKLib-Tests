@@ -51,7 +51,7 @@ std::wstring str_AtoW(const std::string& str)
     return wstr;
 }
 
-typedef ::sklib::implementation::cmdpar_param_base<char> param_base;
+typedef sklib::opaque::cmdpar_param_base<char> param_base;
 
 void show_option_status(const char* tstr, const param_base& param)
 {

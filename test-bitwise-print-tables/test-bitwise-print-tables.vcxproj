@@ -29,26 +29,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
@@ -59,34 +59,38 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\SKConfig\Harvest.props" />
+    <Import Project="..\..\SKLib\props\SKLib.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\SKConfig\Harvest.props" />
+    <Import Project="..\..\SKLib\props\SKLib.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\SKConfig\Harvest.props" />
+    <Import Project="..\..\SKLib\props\SKLib.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\SKConfig\Harvest.props" />
+    <Import Project="..\..\SKLib\props\SKLib.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)\_bin\$(Configuration)_$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)\_tmp\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)\_bin\$(Configuration)_$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)\_tmp\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)\_bin\$(Configuration)_$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)\_tmp\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)\_bin\$(Configuration)_$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)\_tmp\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
   </PropertyGroup>
@@ -96,16 +100,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard_C>stdc11</LanguageStandard_C>
-      <LanguageStandard>stdcpp14</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..</AdditionalIncludeDirectories>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AssemblerOutput>All</AssemblerOutput>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
-      <ProfileGuidedDatabase>$(SolutionDir)\_tmp\$(ProjectName)\$(Configuration)_$(Platform)\$(TargetName).pgd</ProfileGuidedDatabase>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -116,21 +113,11 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard_C>stdc11</LanguageStandard_C>
-      <LanguageStandard>stdcpp14</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..</AdditionalIncludeDirectories>
-      <TreatWarningAsError>true</TreatWarningAsError>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AssemblerOutput>All</AssemblerOutput>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
-      <ProfileGuidedDatabase>$(SolutionDir)\_tmp\$(ProjectName)\$(Configuration)_$(Platform)\$(TargetName).pgd</ProfileGuidedDatabase>
-      <ProgramDatabaseFile>$(SolutionDir)\_tmp\$(ProjectName)\$(Configuration)_$(Platform)\$(TargetName).pdb</ProgramDatabaseFile>
-      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -139,16 +126,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard_C>stdc11</LanguageStandard_C>
-      <LanguageStandard>stdcpp14</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..</AdditionalIncludeDirectories>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AssemblerOutput>All</AssemblerOutput>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
-      <ProfileGuidedDatabase>$(SolutionDir)\_tmp\$(ProjectName)\$(Configuration)_$(Platform)\$(TargetName).pgd</ProfileGuidedDatabase>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -159,21 +139,11 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard_C>stdc11</LanguageStandard_C>
-      <LanguageStandard>stdcpp14</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..</AdditionalIncludeDirectories>
-      <TreatWarningAsError>true</TreatWarningAsError>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AssemblerOutput>All</AssemblerOutput>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
-      <ProfileGuidedDatabase>$(SolutionDir)\_tmp\$(ProjectName)\$(Configuration)_$(Platform)\$(TargetName).pgd</ProfileGuidedDatabase>
-      <ProgramDatabaseFile>$(SolutionDir)\_tmp\$(ProjectName)\$(Configuration)_$(Platform)\$(TargetName).pdb</ProgramDatabaseFile>
-      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -17,6 +17,7 @@
 #include <vector>
 #include <chrono>
 
+#define SKLIB_TARGET_TEST
 #include <SKLib/SKLib.hpp>
 
 std::string STOR;    // we keep here all input from command line parameters, for simplicity

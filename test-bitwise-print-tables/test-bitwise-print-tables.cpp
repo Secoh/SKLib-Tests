@@ -14,19 +14,20 @@
 #include <bitset>
 #include <cstdio>
 
-#include <SKLib/bitwise.hpp>
+#define SKLIB_TARGET_TEST
+#include <SKLib/sklib.hpp>
 
 int main()
 {
-    const auto a8 = sklib::supplement::bits_data_high_half<uint8_t>();
-    const auto a16 = sklib::supplement::bits_data_high_half<uint16_t>();
-    const auto a32 = sklib::supplement::bits_data_high_half<uint32_t>();
-    const auto a64 = sklib::supplement::bits_data_high_half<uint64_t>();
+    const auto a8 = sklib::bits_high_half_v<uint8_t>;
+    const auto a16 = sklib::bits_high_half_v<uint16_t>;
+    const auto a32 = sklib::bits_high_half_v<uint32_t>;
+    const auto a64 = sklib::bits_high_half_v<uint64_t>;
 
     std::cout << std::bitset<sklib::OCTET_BITS>(a8) << "\n"
-        << std::bitset<sklib::supplement::bits_data_width<int16_t>()>(a16) << "\n"
-        << std::bitset<sklib::supplement::bits_data_width<int32_t>()>(a32) << "\n"
-        << std::bitset<sklib::supplement::bits_data_width<int64_t>()>(a64) << "\n";
+        << std::bitset<sklib::bits_width_v<int16_t>>(a16) << "\n"
+        << std::bitset<sklib::bits_width_v<int32_t>>(a32) << "\n"
+        << std::bitset<sklib::bits_width_v<int64_t>>(a64) << "\n";
 
     // Flip, Rank, Distance, Base64
 

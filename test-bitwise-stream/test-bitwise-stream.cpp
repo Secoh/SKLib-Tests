@@ -20,7 +20,7 @@
 uint64_t clean_int(uint8_t Nbit, uint64_t data)
 {
     if (!Nbit) return 0;
-    if (Nbit >= sklib::supplement::bits_data_width<uint64_t>()) return ~0ull;
+    if (Nbit >= sklib::bits_width_v<uint64_t>) return ~0ull;
     return (data & ((1ull << Nbit) - 1));
 }
 
@@ -28,7 +28,7 @@ uint64_t clean_int(uint8_t Nbit, uint64_t data)
 // where N is 1..64, Data is unsigned integer within N bits
 std::pair<uint8_t, uint64_t> generate_node()
 {
-    uint8_t N = (rand() % sklib::supplement::bits_data_width<uint64_t>()) + 1;
+    uint8_t N = (rand() % sklib::bits_width_v<uint64_t>) + 1;
     size_t K = (N + sklib::OCTET_BITS - 1) % sklib::OCTET_BITS;
 
     uint64_t V = 0;

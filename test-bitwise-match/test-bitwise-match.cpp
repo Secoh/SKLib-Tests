@@ -18,7 +18,7 @@
 #include <ctime>
 #include <cmath>
 
-#include <SKLib/bitwise.hpp>
+#include <SKLib/sklib.hpp>
 
 template<class T>
 bool do_test(T A)
