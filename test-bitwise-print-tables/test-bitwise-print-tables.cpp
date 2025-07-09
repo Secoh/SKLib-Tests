@@ -31,10 +31,10 @@ int main()
 
     // Flip, Rank, Distance, Base64
 
-    sklib::supplement::table256_print("\nTable Flip\n", sklib::supplement::bits_flip_get_table(), 16, true);
-    sklib::supplement::table256_print("\nTable Rank\n", sklib::supplement::bits_rank_get_table(), 32);
-    sklib::supplement::table256_print("\nTable Distance\n", sklib::supplement::bits_distance_get_table(), 32);
-    sklib::supplement::table256_print("\nTable Base64 Inverse\n", sklib::base64_type::get_inverse_table(), 16, true);
+    sklib::aux::table256_print("\nTable Flip\n", sklib::aux::bits_flip_get_table(), 16, true);
+    sklib::aux::table256_print("\nTable Rank\n", sklib::aux::bits_rank_get_table(), 32);
+    sklib::aux::table256_print("\nTable Distance\n", sklib::aux::bits_distance_get_table(), 32);
+    sklib::aux::table256_print("\nTable Base64 Inverse\n", sklib::base64_type::get_inverse_table(), 16, true);
 
     return 0;
 }

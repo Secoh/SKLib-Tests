@@ -27,7 +27,7 @@ bool do_test(T A)
 
     auto v1f = sklib::bits_flip<T>(A);
     auto a1f = sklib::bits_flip<T>(v1f);
-    auto v2f = sklib::supplement::bits_flip_bruteforce<T>(A);
+    auto v2f = sklib::aux::bits_flip_bruteforce<T>(A);
 
     if (a1f != A)
     {
@@ -44,7 +44,7 @@ bool do_test(T A)
     // rank
 
     unsigned v1r = sklib::bits_rank<T>(A);
-    unsigned v2r = (T)sklib::supplement::bits_rank_bruteforce(A);
+    unsigned v2r = (T)sklib::aux::bits_rank_bruteforce(A);
 
     if (v1r != v2r)
     {
@@ -54,7 +54,7 @@ bool do_test(T A)
 
     if (sizeof(T) == sizeof(uint8_t))
     {
-        auto v3r = sklib::supplement::bits_rank8_fork((uint8_t)A);
+        auto v3r = sklib::aux::bits_rank8_fork((uint8_t)A);
         if (v1r != v3r)
         {
             std::cout << "Mismatch rank() algorithms: Input=" << (uint64_t)A << ", Common=" << (uint64_t)v1r << ", Fork=" << (uint64_t)v3r << "\n";
@@ -65,7 +65,7 @@ bool do_test(T A)
     // distance
 
     unsigned v1d = sklib::bits_distance<T>(A);
-    unsigned v2d = sklib::supplement::bits_distance_bruteforce<T>(A);
+    unsigned v2d = sklib::aux::bits_distance_bruteforce<T>(A);
 
     if (v1d != v2d)
     {
@@ -88,6 +88,64 @@ uint8_t  erand8()  { return (uint8_t) floor(exp(rand() * (8*M_LN2/RAND_MAX))); }
 uint16_t erand16() { return (uint16_t)floor(exp(rand() * (16*M_LN2/RAND_MAX))); }
 uint32_t erand32() { return (uint32_t)floor(exp(rand() * (32*M_LN2/RAND_MAX))); }
 uint64_t erand64() { return (uint64_t)floor(exp(rand() * (64*M_LN2/RAND_MAX))); }
+
+// --------------------------------------------------------------------------
+// Testing compile-time constants
+
+template<class T>
+struct exa_type : public sklib::aux::compound_integer_base<8 * sizeof(T), true>
+{
+    T data;
+    bool sign;
+};
+
+constexpr int exa_1 = sklib::is_signed_v<exa_type<unsigned>>;
+constexpr int exa_2 = sklib::is_integer_v<exa_type<unsigned>>;
+constexpr int exa_3 = sklib::is_signed_v<unsigned>;
+constexpr int exa_4 = sklib::is_integer_v<unsigned>;
+// constexpr int exa_5 = sklib::is_signed_v<void>;  // error
+
+typedef sklib::make_unsigned_if_integer_type<int> tta_1;
+typedef sklib::make_unsigned_if_integer_type<int8_t> tta_2;
+typedef sklib::make_unsigned_if_integer_type<uint8_t> tta_3;
+typedef sklib::make_unsigned_if_integer_type<int8_t*> tta_4;
+
+constexpr auto exb_1 = sklib::bits_data_cap<int>(9);
+constexpr auto exb_2 = sklib::bits_data_high_1<int>(9);
+constexpr auto exb_3 = sklib::bits_data_mask<int>(9);
+constexpr auto exb_4 = sklib::bits_data_mask<int>(16);
+constexpr auto exb_5 = sklib::bits_data_mask<uint16_t>(16);
+constexpr auto exb_6 = sklib::bits_data_mask<uint16_t>(3);
+constexpr auto exb_7 = sklib::bits_data_mask<uint16_t>(0);
+
+constexpr int exc_1 = sklib::bits_width_v<int>;
+constexpr int exc_2 = sklib::bits_width_v<uint64_t>;
+constexpr int exc_3 = sklib::bits_width_v<exa_type<uint16_t>>;
+// const int exc_4 = sklib::bits_width_v<void>;  // error
+
+constexpr auto exc_5 = sklib::bits_mask_v<int>;
+constexpr auto exc_6 = sklib::bits_mask_v<uint64_t>;
+constexpr auto exc_7 = sklib::bits_mask_v<int8_t>;
+constexpr auto exc_8 = sklib::bits_high_1_v<int>;
+
+constexpr auto exd_1 = sklib::bits_low_half_v<unsigned>;
+constexpr auto exd_2 = sklib::bits_high_half_v<unsigned>;
+// constexpr auto exd_3 = sklib::bits_low_half_v<int>;  // error
+
+constexpr auto exe_1 = sklib::bits_data_cap_v<int, 9>;
+constexpr auto exe_2 = sklib::bits_data_high_1_v<int, 9>;
+constexpr auto exe_3 = sklib::bits_data_mask_v<int, 9>;
+constexpr auto exe_4 = sklib::bits_data_mask_v<int, 16>;
+constexpr auto exe_5 = sklib::bits_data_mask_v<int, 31>;
+// constexpr auto exe_6 = sklib::bits_data_mask_v<int, 32>; // error
+constexpr auto exe_7 = sklib::bits_data_mask_v<uint16_t, 17>;
+constexpr auto exe_8 = sklib::bits_data_mask_v<uint16_t, 16>;
+constexpr auto exe_9 = sklib::bits_data_mask_v<uint16_t, 3>;
+constexpr auto exe_A = sklib::bits_data_mask_v<uint16_t, 0>;
+
+
+
+// --------------------------------------------------------------------------
 
 int main()
 {

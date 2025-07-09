@@ -14,42 +14,70 @@
 #define SKLIB_TARGET_TEST
 #include "SKLib/sklib.hpp"
 
-// the custom library declares the anchor type (key), unique template-less type to carry data
-// and unique family of types to describe the bit pack
+// ========================================================
+// General description
+//
+// The Props library is designed to encode, store, transmit, and test multiple attributes
+// (properties) in a single integer number. The value of each property is represented by a small 
+// integer. (Analogy: C enum.) One property occupies a range of bits, and the ranges are written
+// one after another in the data carrier type.
+//
+// The library provides functions to compute the bit packs, sizes, shifts automatically. The
+// individual properties may be combined with othe properties, so the entire property set may be
+// encoded in a C/C++ expression. The property value may come from the enum-like constant, or be
+// loaded from a file.
+//
+// Rationale. Lets consider a function to open a serial port. (That was the origin of Props btw.)
+// Serial I/O requires multiple independent parameters to be sent to the system: port number, baud
+// rate, data bits, stop bits, flow control mode, and timeout. The port number is 8-bit integer,
+// the commonly used different baud rates are quite few. The same is for the timeout figures.
+// Instead of sending all the parameters separately, it is possible to pack them into one uint64_t.
+//
+// Different property sets may exist in the compilation unit in the same time. The Props library
+// employs strong type check to prevent collisions from unrelated set. Also, a given property may
+// be entered into the expression only once.
+//
+// To make the property set unique, the user code must declare the "anchor" - a dummy type that
+// will be considered unique by C++ compiler. Then the anchor is added to the Props template
+// thus creating the set of unique types.
 
+// ========================================================
+// First, basic example of Props declaration and structure
+
+// The anchor
 struct TableUniqueSpecifier {};
+
+// The unique data type to carry packed data
+// This type is also used in the user function that receives the property set
+// All types used for property values are derived from this type
 using TableProps = sklib::bit_props_data_type<TableUniqueSpecifier, int>;
-template<class Prev, auto enumCap> using TableConfigElem = sklib::bit_props_config_type<TableProps, Prev, enumCap>;
 
-struct my_anchor {};
-using my_props_data = sklib::bit_props_data_type<my_anchor, int>;
-template<class Prev, auto enumCap> using my_props_elem = sklib::bit_props_config_type<my_props_data, Prev, enumCap>;
+// The family of helper types to compute propery placement and to make the value assignment
+template<class Prev, auto enumCap>
+using TableConfigElem = sklib::bit_props_config_type<TableProps, Prev, enumCap>;
 
-struct fruit_anchor {};
-using fruit_props_data = sklib::bit_props_data_type<fruit_anchor, int>;
-template<class Prev, auto enumCap> using fruit_props_elem = sklib::bit_props_config_type<fruit_props_data, Prev, enumCap>;
-
-// the custom library declares constants that represent features;
-// they are stored in the corresponding bit ranges
-// the values and the bit ranges are calculated automatically
-
-class Table     // int-like properties / config library is designed for use from inside a class
-{               // that represents the collection of the features
+// In the example below, the actual property values behave similar to C++ class enum elements,
+// except that they can be added to each other (with restrictions mentioned above)
+class Table
+{
 private:
+    // the actual content has to come from somewhere
     enum { kitchen, office, dinner, night, workshop, picknick, table_cap }; // note that we use traditional C enums
     enum { round, rectangle, shape_cap };                                   // with Cap element (max+1)
     enum { black, white, grey, red, blue, green, color_cap };               // namespace pollution does not happen
     enum { stone, wood, steel, plastic, concrete, material_cap };           // because they are all private
 
 public:
+    // dedicated types for each specific property
     typedef TableConfigElem<void,        table_cap>    table_field;     // each group of properties occupy
     typedef TableConfigElem<table_field, shape_cap>    shape_field;     // the specific bit range computed
     typedef TableConfigElem<shape_field, color_cap>    color_field;     // at the compile time
     typedef TableConfigElem<color_field, material_cap> material_field;
 
-    static constexpr table_field Kitchen  {kitchen};    // the basic form of constants initialization
-    static constexpr table_field Office   {office};     // the public variables work like elements of enum class
-    static constexpr table_field Dinner   {dinner};
+    // the group of constants represent all possible values of the specific property
+    static constexpr table_field Kitchen  {kitchen};
+    static constexpr table_field Office   {office};   // the basic form of constants initialization
+    static constexpr table_field Dinner   {dinner};   // the public variables work like elements of enum class
     static constexpr table_field Night    {night};
     static constexpr table_field Workshop {workshop};
     static constexpr table_field Picknick {picknick};
@@ -57,18 +85,18 @@ public:
     static constexpr shape_field Round {round};         // items from different groups can add to each other
     static constexpr shape_field Rectangle {rectangle}; // just like traditional C bit property constants
 
-    static constexpr color_field Black {black};
-    static constexpr color_field White {white};
-    static constexpr color_field Grey  {grey};
-    static constexpr color_field Red   {red};
-    static constexpr color_field Blue  {blue};
-    static constexpr color_field Green {green};
+    static constexpr auto Black = color_field{black};   // alternative way to declare member variables
+    static constexpr auto White = color_field{white};
+    static constexpr auto Grey  = color_field{grey};
+    static constexpr auto Red   = color_field{red};
+    static constexpr auto Blue  = color_field{blue};
+    static constexpr auto Green = color_field{green};
 
-    static constexpr material_field Stone    {stone};
-    static constexpr material_field Wood     {wood};
-    static constexpr material_field Steel    {steel};
-    static constexpr material_field Plastic  {plastic};
-    static constexpr material_field Concrete {concrete};
+    static constexpr auto Stone    = material_field{stone}.get();  // get() "reduces" the type and exposes
+    static constexpr auto Wood     = material_field{wood}.get();   // the data mask in MSVC editor
+    static constexpr auto Concrete = material_field{concrete}.get();
+    static constexpr auto Plastic  = +material_field{plastic};     // operator+() has the same effect as .get()
+    static constexpr auto Steel    = +material_field{steel}.get(); // also legal
 
     void Describe(TableProps what);     // function to handle the configuration
     // normally, loading, opening, or initialization of something, depending on the caller's request
@@ -77,31 +105,45 @@ public:
     // bit fields and groups into the single integer value, likely, taking just one CPU register
 };
 
-class my_collection
+void Table::Describe(TableProps what)
 {
-private:
-    enum { baud_9k, baud_1k, baud_2k, baud_cap };
-    enum { data_8, data_6, data_7, data_cap };
-    enum { stop_1, stop_2, stop_cap };
+    std::string model, shape, color, material;
 
-public:
-    typedef my_props_elem<void,       baud_cap> baud_field;
-    typedef my_props_elem<baud_field, data_cap> data_field;
-    typedef my_props_elem<data_field, stop_cap> stop_field;
+    if (what.has(Kitchen))  model = "Kitchen";   // function has() verifies that variable "what" in the bit range
+    if (what.has(Office))   model = "Office";    // of table_field - which is "Kitchen", "Office", etc - have the
+    if (what.has(Dinner))   model = "Dinner";    // value equal to the argument
+    if (what.has(Night))    model = "Night";     // E.g. it compares "what" to "Kitchen" in the first line of the
+    if (what.has(Workshop)) model = "Workshop";  // block, ignoring all bits unrelated to Kitchen data type
+    if (what.has(Picknick)) model = "Picknick";
 
-    static constexpr baud_field Baud1200 {baud_1k};
-    static constexpr baud_field Baud2400 {baud_2k};
-    static constexpr baud_field Baud9600 {baud_9k};
+    if (what[Round])     shape = "round";        // operator[]() is the shortcut to .has()
+    if (what[Rectangle]) shape = "rectangular";
 
-    static constexpr data_field Data6 {data_6};
-    static constexpr auto Data7 = +data_field{data_7};
-    static constexpr data_field Data8 {data_8};
+    if (what[Black]) color = "black";
+    if (what[White]) color = "white";
+    if (what[Grey])  color = "grey";
+    if (what[Red])   color = "red";
+    if (what[Blue])  color = "blue";
+    if (what[Green]) color = "green";
 
-    static constexpr stop_field Stop1 {stop_1};
-    static constexpr stop_field Stop2 {stop_2};
-};
+    if (what[Stone])    material = "stone";
+    if (what[Wood])     material = "wood";
+    if (what[Steel])    material = "steel";
+    if (what[Plastic])  material = "plastic";
+    if (what[Concrete]) material = "concrete";
 
-class fruit_collection
+    std::cout << model << " " << color << " " << shape << " table made of " << material << "\n";
+}
+
+// ========================================================
+// Second, to demonstrate the collision avoidance
+// and a useful case of defining the prohibited combinations 
+
+struct fruit_anchor {};
+using fruit_props_data = sklib::bit_props_data_type<fruit_anchor, int>;
+template<class Prev, auto enumCap> using fruit_props_elem = sklib::bit_props_config_type<fruit_props_data, Prev, enumCap>;
+
+class FruitProps
 {
 private:
     enum fruit { apple, orange, plum, peach, banana, lemon, fruit_cap };
@@ -130,63 +172,34 @@ public:
 
     static constexpr fruit_taste Sweet  {sweet};
     static constexpr fruit_taste Salty  {salty};
-    static constexpr fruit_taste Spicy  {spicy};
-    static constexpr fruit_taste Sour  {sour};
+    static constexpr auto Spicy = fruit_taste{spicy};
+    static constexpr auto Sour = +fruit_taste{sour};   // unary + reduces the type
 
     static constexpr fruit_shape Sphere  {sphere};
     static constexpr fruit_shape Cube  {cube};
     static constexpr fruit_shape Pyramid  {pyramid};
-
 };
 
-void Table::Describe(TableProps what)
-{
-    std::string model, shape, color, material;
-
-    if (what.has(Kitchen))  model = "Kitchen";
-    if (what.has(Office))   model = "Office";
-    if (what.has(Dinner))   model = "Dinner";
-    if (what.has(Night))    model = "Night";
-    if (what.has(Workshop)) model = "Workshop";
-    if (what.has(Picknick)) model = "Picknick";
-
-    if (what[Round])     shape = "round";
-    if (what[Rectangle]) shape = "rectangular";
-
-    if (what[Black]) color = "black";
-    if (what[White]) color = "white";
-    if (what[Grey])  color = "grey";
-    if (what[Red])   color = "red";
-    if (what[Blue])  color = "blue";
-    if (what[Green]) color = "green";
-
-    if (what[Stone])    material = "stone";
-    if (what[Wood])     material = "wood";
-    if (what[Steel])    material = "steel";
-    if (what[Plastic])  material = "plastic";
-    if (what[Concrete]) material = "concrete";
-
-    std::cout << model << " " << color << " " << shape << " table made of " << material << "\n";
-}
+// ========================================================
+// Use scenarios
 
 int main()
 {
     Table().Describe(Table::Picknick + Table::Stone + Table::Red +Table::Round);
 
-    my_collection AAA;
+    Table AAA;
     const int xx = 1<< 3;
-    //    props::stop_field::
-    const auto d7 = AAA.Data7.data;
+
+    const auto d7 = AAA.Concrete.data;
+
+    // AAA.Black.data = 42;  // error, is it const
 
     std::cout << "Hello World!\n";
 
-    constexpr auto VV = fruit_collection::Red + fruit_collection::Cube;
-    // constexpr auto VV1 = fruit_collection::Red + my_collection::Stop2;    // error, categories don't match
-    // constexpr auto VV2 = fruit_collection::Red + fruit_collection::Blue;  // error, only one subcategory can be added
+    constexpr auto VV = FruitProps::Red + FruitProps::Cube;
+    // constexpr auto VV1 = FruitProps::Red + Table::Wood;       // error, categories don't match
+    // constexpr auto VV2 = FruitProps::Red + FruitProps::Blue;  // error, only one subcategory can be added
 
-    constexpr auto VV3 = +fruit_collection::Pyramid;
-
-    // error    collection::Baud1200.data = 33;
-
+    constexpr auto VV3 = +FruitProps::Pyramid;
 }
 

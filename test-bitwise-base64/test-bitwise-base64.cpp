@@ -64,7 +64,7 @@ int main(int argn, char *argc[])
 
     if (get_table)
     {
-        sklib::supplement::table256_print("\nBase64 Inverse Table\n", sklib::base64_type::get_inverse_table(), 16, true);
+        sklib::aux::table256_print("\nBase64 Inverse Table\n", sklib::base64_type::get_inverse_table(), 16, true);
         return 0;
     }
 
