@@ -8,7 +8,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test-checksum-print-tables"
 		{6BE23730-EBAD-47FF-A798-93F782F5DE8E} = {6BE23730-EBAD-47FF-A798-93F782F5DE8E}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sklib", "..\SKLib\sklib\sklib.vcxproj", "{6BE23730-EBAD-47FF-A798-93F782F5DE8E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sklib", "..\SKLib\sklib.vcxproj", "{6BE23730-EBAD-47FF-A798-93F782F5DE8E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test-checksum-match", "test-checksum-match\test-checksum-match.vcxproj", "{72ACF857-FB58-40F2-88A2-8997997DE35D}"
 	ProjectSection(ProjectDependencies) = postProject

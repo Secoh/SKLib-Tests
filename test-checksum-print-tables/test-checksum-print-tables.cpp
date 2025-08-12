@@ -9,9 +9,12 @@
 // For more information, please refer to: http://unlicense.org/
 //
 
+#define SKLIB_TARGET_TEST
+
 #include <iostream>
 
-#include <SKLib/checksum.hpp>
+#include <SKLib/include/checksum.hpp>
+#include <SKLib/include/utility.hpp>
 
 int main()
 {
